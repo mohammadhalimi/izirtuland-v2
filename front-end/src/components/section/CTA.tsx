@@ -112,7 +112,7 @@ export default component$(() => {
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
               <span>📞</span>
               <span class="font-semibold">تلفن:</span>
-              <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+              <span>021-33370954</span>
             </div>
             <div class="w-px h-6 bg-white bg-opacity-30"></div>
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
