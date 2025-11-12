@@ -15,7 +15,7 @@ export default component$(() => {
   });
 
   return (
-    <header class="sticky top-0 z-50 bg-white shadow-sm">
+    <header class="sticky top-0 z-100 bg-white shadow-sm">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
           {/* لوگو */}

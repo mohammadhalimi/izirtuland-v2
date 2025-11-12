@@ -1,13 +1,74 @@
-// src/routes/admin/index.tsx
+// src/routes/admin/dashboard/index.tsx
 import { component$, useSignal, $ } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
+import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
+
+// Type برای اطلاعات ادمین
+interface AdminData {
+  _id: string;
+  username: string;
+  email: string;
+}
+
+// Loader برای چک کردن احراز هویت
+export const useAuthCheck = routeLoader$(({ cookie, redirect }) => {
+  const authToken = cookie.get('auth-token')?.value;
+  const adminDataCookie = cookie.get('admin-data')?.value;
+  
+  console.log('Auth Token:', authToken);
+  console.log('Admin Data:', adminDataCookie);
+  
+  if (!authToken || !adminDataCookie) {
+    console.log('Redirecting to /Admin - No auth data');
+    throw redirect(302, '/Admin');
+  }
+  
+  try {
+    const adminData: AdminData = JSON.parse(adminDataCookie);
+    return {
+      isAuthenticated: true,
+      admin: adminData,
+      token: authToken
+    };
+  } catch (error) {
+    console.log('Error parsing admin data:', error);
+    // اگر اطلاعات معتبر نبود، کوکی‌ها را پاک کن
+    cookie.delete('auth-token', { path: '/' });
+    cookie.delete('admin-data', { path: '/' });
+    throw redirect(302, '/Admin');
+  }
+});
+
+// Action برای لاگاوت - اصلاح شده
+export const useLogoutAction = routeAction$((_, { cookie, redirect }) => {
+  // پاک کردن کوکی‌ها با Qwik cookie
+  cookie.delete('auth-token', { path: '/' });
+  cookie.delete('admin-data', { path: '/' });
+  
+  // ریدایرکت به صفحه لاگین
+  throw redirect(302, '/Admin');
+});
 
 export default component$(() => {
+  const authData = useAuthCheck();
+  const logoutAction = useLogoutAction();
   const sidebarOpen = useSignal(false);
   const activeTab = useSignal('dashboard');
+  const showLogoutModal = useSignal(false);
 
   const toggleSidebar = $(() => {
     sidebarOpen.value = !sidebarOpen.value;
+  });
+
+  const handleLogout = $(() => {
+    showLogoutModal.value = true;
+  });
+
+  const confirmLogout = $(() => {
+    logoutAction.submit();
+  });
+
+  const cancelLogout = $(() => {
+    showLogoutModal.value = false;
   });
 
   // آمار کلی
@@ -16,24 +77,6 @@ export default component$(() => {
     { title: 'سفارشات', value: '۲,۸۴۷', change: '+۸.۲%', icon: '📦', color: 'blue' },
     { title: 'مشتریان', value: '۱۲,۸۴۶', change: '+۵.۷%', icon: '👥', color: 'purple' },
     { title: 'محصولات', value: '۱۵۶', change: '+۳.۱%', icon: '🌿', color: 'orange' }
-  ];
-
-  // آخرین سفارشات
-  const recentOrders = [
-    { id: '#ORD-2847', customer: 'محمد رضایی', product: 'کود NPK', amount: '۴,۲۵۰,۰۰۰', status: 'completed', date: '۱۴۰۲/۱۰/۱۵' },
-    { id: '#ORD-2846', customer: 'فاطمه محمدی', product: 'ورمی کمپوست', amount: '۲,۸۰۰,۰۰۰', status: 'processing', date: '۱۴۰۲/۱۰/۱۵' },
-    { id: '#ORD-2845', customer: 'علیرضا کریمی', product: 'کود دامی', amount: '۱,۵۰۰,۰۰۰', status: 'pending', date: '۱۴۰۲/۱۰/۱۴' },
-    { id: '#ORD-2844', customer: 'زهرا حسینی', product: 'سم ارگانیک', amount: '۳,۲۰۰,۰۰۰', status: 'completed', date: '۱۴۰۲/۱۰/۱۴' },
-    { id: '#ORD-2843', customer: 'امیرحسین نجفی', product: 'کود مایع', amount: '۲,۱۰۰,۰۰۰', status: 'completed', date: '۱۴۰۲/۱۰/۱۳' }
-  ];
-
-  // محصولات پرفروش
-  const topProducts = [
-    { name: 'کود NPK 20-20-20', sales: 847, revenue: '۳۴,۸۰۰,۰۰۰', growth: '+۱۵%' },
-    { name: 'ورمی کمپوست ارگانیک', sales: 632, revenue: '۱۸,۹۶۰,۰۰۰', growth: '+۲۲%' },
-    { name: 'کود دامی پوسیده', sales: 521, revenue: '۷,۸۱۵,۰۰۰', growth: '+۸%' },
-    { name: 'سم ارگانیک نیم آزال', sales: 487, revenue: '۱۴,۶۱۰,۰۰۰', growth: '+۱۸%' },
-    { name: 'کود مایع جلبک دریایی', sales: 423, revenue: '۸,۴۶۰,۰۰۰', growth: '+۱۲%' }
   ];
 
   return (
@@ -89,14 +132,33 @@ export default component$(() => {
 
           {/* User Profile */}
           <div class="p-4 border-t border-gray-200">
-            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse mb-3">
               <div class="w-10 h-10 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                ا
+                {authData.value.admin.username.charAt(0)}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">ادمین</p>
-                <p class="text-sm text-gray-500 truncate">admin@porbar-baghstan.ir</p>
+                <p class="text-sm font-medium text-gray-900 truncate">{authData.value.admin.username}</p>
+                <p class="text-sm text-gray-500 truncate">{authData.value.admin.email}</p>
               </div>
+            </div>
+            
+            {/* دکمه خروج */}
+            <button
+              onClick$={handleLogout}
+              class="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 border border-red-200"
+            >
+              <span>🚪</span>
+              <span>خروج از حساب</span>
+            </button>
+
+            {/* اطلاعات session (برای دیباگ) */}
+            <div class="mt-3 p-2 bg-gray-100 rounded-lg">
+              <p class="text-xs text-gray-600">
+                وضعیت: <span class="text-green-600 font-medium">فعال</span>
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                مدت زمان باقی‌مانده: ۲۴ ساعت
+              </p>
             </div>
           </div>
         </div>
@@ -124,8 +186,12 @@ export default component$(() => {
                 <span class="text-lg">🔔</span>
                 <span class="absolute top-1 left-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              <div class="w-8 h-8 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                ا
+              
+              {/* منوی کاربر */}
+              <div class="relative">
+                <div class="w-8 h-8 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold cursor-pointer">
+                  {authData.value.admin.username.charAt(0)}
+                </div>
               </div>
             </div>
           </div>
@@ -133,6 +199,15 @@ export default component$(() => {
 
         {/* Main Content Area */}
         <main class="flex-1 overflow-auto p-6">
+          {/* Welcome Message */}
+          <div class="bg-linear-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white mb-8">
+            <h2 class="text-2xl font-bold mb-2">سلام، {authData.value.admin.username}!</h2>
+            <p class="opacity-90">خوش آمدید به پنل مدیریت پربار باغستان</p>
+            <div class="mt-2 text-sm opacity-80">
+              <p>آخرین ورود: {new Date().toLocaleDateString('fa-IR')}</p>
+            </div>
+          </div>
+
           {/* Stats Cards */}
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
@@ -151,64 +226,25 @@ export default component$(() => {
             ))}
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* آخرین سفارشات */}
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-bold text-gray-800">آخرین سفارشات</h2>
-                <Link href="/admin/orders" class="text-green-600 hover:text-green-700 text-sm font-medium">
-                  مشاهده همه
-                </Link>
+          {/* Session Management Card */}
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">مدیریت session</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                <h3 class="font-medium text-green-800 mb-2">وضعیت احراز هویت</h3>
+                <p class="text-sm text-green-700">شما با موفقیت وارد شده‌اید</p>
+                <p class="text-xs text-green-600 mt-1">session شما فعال است</p>
               </div>
-              <div class="space-y-4">
-                {recentOrders.map((order) => (
-                  <div key={order.id} class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center space-x-3 rtl:space-x-reverse mb-2">
-                        <span class="text-sm font-medium text-gray-900">{order.id}</span>
-                        <span class={`
-                          px-2 py-1 rounded-full text-xs font-medium
-                          ${order.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                          ${order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' : ''}
-                          ${order.status === 'pending' ? 'bg-gray-100 text-gray-800' : ''}
-                        `}>
-                          {order.status === 'completed' && 'تکمیل شده'}
-                          {order.status === 'processing' && 'در حال پردازش'}
-                          {order.status === 'pending' && 'در انتظار'}
-                        </span>
-                      </div>
-                      <p class="text-sm text-gray-600 truncate">{order.customer} - {order.product}</p>
-                    </div>
-                    <div class="text-left ml-4">
-                      <p class="text-sm font-medium text-gray-900">{order.amount} تومان</p>
-                      <p class="text-xs text-gray-500">{order.date}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* محصولات پرفروش */}
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-bold text-gray-800">محصولات پرفروش</h2>
-                <Link href="/admin/products" class="text-green-600 hover:text-green-700 text-sm font-medium">
-                  مشاهده همه
-                </Link>
-              </div>
-              <div class="space-y-4">
-                {topProducts.map((product, index) => (
-                  <div key={index} class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <div class="flex-1 min-w-0">
-                      <h3 class="text-sm font-medium text-gray-900 mb-1">{product.name}</h3>
-                      <div class="flex items-center space-x-4 rtl:space-x-reverse text-xs text-gray-600">
-                        <span>{product.sales} فروش</span>
-                        <span>{product.revenue} تومان</span>
-                      </div>
-                    </div>
-                    <span class="text-green-600 text-sm font-medium">{product.growth}</span>
-                  </div>
-                ))}
+              
+              <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 class="font-medium text-blue-800 mb-2">مدیریت حساب</h3>
+                <p class="text-sm text-blue-700">می‌توانید از حساب خود خارج شوید</p>
+                <button 
+                  onClick$={handleLogout}
+                  class="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  خروج از سیستم
+                </button>
               </div>
             </div>
           </div>
@@ -249,6 +285,32 @@ export default component$(() => {
           </div>
         </main>
       </div>
+
+      {/* Modal تایید خروج */}
+      {showLogoutModal.value && (
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">تایید خروج</h3>
+            <p class="text-gray-600 mb-6">آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟</p>
+            
+            <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+              <button
+                onClick$={cancelLogout}
+                class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                انصراف
+              </button>
+              <button
+                onClick$={confirmLogout}
+                disabled={logoutAction.isRunning}
+                class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors duration-200 disabled:opacity-50"
+              >
+                {logoutAction.isRunning ? 'در حال خروج...' : 'خروج'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen.value && (
