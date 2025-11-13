@@ -1,17 +1,21 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import bcrypt from "bcrypt";
 
-export interface IAdmin {
+export interface IAdmin extends Document {
   username: string;
   password: string;
+  role: "superadmin" | "admin";
+  createdAt: Date;
 }
 
 const adminSchema = new Schema<IAdmin>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, enum: ["superadmin", "admin"], default: "admin" },
+  createdAt: { type: Date, default: Date.now },
 });
 
-// هش کردن رمز قبل از ذخیره
+// 🧂 هش کردن رمز قبل از ذخیره
 adminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);

@@ -3,6 +3,7 @@ export interface Admin {
   _id: string;
   username: string;
   email: string;
+  role: 'admin' | 'superadmin';
 }
 
 export interface LoginResponse {

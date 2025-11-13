@@ -12,16 +12,65 @@ export const registerAdmin = async (username: string, password: string) => {
 };
 
 export const loginAdmin = async (username: string, password: string) => {
-    const admin = await Admin.findOne({ username });
-    if (!admin) throw new Error("Admin not found");
+  const admin = await Admin.findOne({ username });
+  if (!admin) throw new Error("Invalid credentials");
 
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) throw new Error("Invalid credentials");
-    const token = jwt.sign(
-        { id: admin._id, username: admin.username },
-        process.env.JWT_SECRET!,
-        { expiresIn: "1d" }
-    );
+  // 🔹 بررسی رمز عبور
+  const isMatch = await bcrypt.compare(password, admin.password);
+    console.log("🔑 Password match:", isMatch);
+  if (!isMatch) throw new Error("Invalid credentials");
 
-    return { token, admin };
+  // 🔹 ایجاد توکن
+  const token = jwt.sign(
+    { id: admin._id, role: admin.role },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "7d" }
+  );
+
+  return {
+    token,
+    admin: {
+      _id: admin._id,
+      username: admin.username,
+      role: admin.role,
+    },
+  };
+};
+
+export const getAllAdmins = async () => {
+  try {
+    const admins = await Admin.find().select("-password"); // رمز عبور حذف شود
+    return admins;
+  } catch (error) {
+    throw new Error("خطا در دریافت لیست ادمین‌ها");
+  }
+};
+
+export const deleteAdminById = async (id: string) => {
+  const deleted = await Admin.findByIdAndDelete(id);
+  return deleted;
+};
+
+export const updateAdminInfo = async (
+  adminId: string,
+  data: { username?: string; password?: string }
+) => {
+  const admin = await Admin.findById(adminId);
+  if (!admin) throw new Error("ادمین مورد نظر یافت نشد");
+
+  if (data.username) admin.username = data.username;
+
+  if (data.password) {
+    const salt = await bcrypt.genSalt(10);
+    admin.password = await bcrypt.hash(data.password, salt);
+  }
+
+  await admin.save();
+
+  return {
+    id: admin._id,
+    username: admin.username,
+    role: admin.role,
+    updatedAt: new Date()
+  };
 };
