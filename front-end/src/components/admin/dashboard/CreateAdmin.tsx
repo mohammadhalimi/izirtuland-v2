@@ -15,6 +15,7 @@ interface Admin {
   username: string;
   role: 'superadmin' | 'admin';
   createdAt?: string;
+  profileImage: string;
 }
 
 export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
@@ -24,12 +25,12 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
   const isLoading = useSignal(false);
   const message = useSignal('');
   const messageType = useSignal<'success' | 'error'>('success');
-  
+
   // state برای لیست ادمین‌ها
   const admins = useSignal<Admin[]>([]);
   const loadingAdmins = useSignal(true);
   const deletingAdminId = useSignal<string | null>(null);
-  
+
   // state برای modal حذف
   const showDeleteModal = useSignal(false);
   const adminToDelete = useSignal<Admin | null>(null);
@@ -110,12 +111,12 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
       if (response.ok) {
         message.value = 'ادمین جدید با موفقیت ایجاد شد';
         messageType.value = 'success';
-        
+
         // پاک کردن فرم
         username.value = '';
         password.value = '';
         confirmPassword.value = '';
-        
+
         // رفرش لیست ادمین‌ها
         await fetchAdmins();
       } else {
@@ -175,7 +176,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
       if (response.ok) {
         message.value = `ادمین "${adminToDelete.value.username}" با موفقیت حذف شد`;
         messageType.value = 'success';
-        
+
         // رفرش لیست ادمین‌ها
         await fetchAdmins();
       } else {
@@ -207,7 +208,12 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
       return 'نامشخص';
     }
   });
-
+  const getFullImageUrl = (imagePath: string | undefined) => {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+    // اگر مسیر نسبی است، آدرس کامل بسازید
+    return `http://localhost:5000${imagePath}`;
+  };
   return (
     <div class="space-y-6">
       {/* اطلاعات ادمین فعلی */}
@@ -279,11 +285,10 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
 
           {/* پیام */}
           {message.value && (
-            <div class={`p-4 rounded-xl ${
-              messageType.value === 'success' 
-                ? 'bg-green-50 text-green-700 border border-green-200' 
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
+            <div class={`p-4 rounded-xl ${messageType.value === 'success'
+              ? 'bg-green-50 text-green-700 border border-green-200'
+              : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
               {message.value}
             </div>
           )}
@@ -362,7 +367,15 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
                     <td class="px-6 py-4">
                       <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <div class="w-8 h-8 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {admin.username.charAt(0).toUpperCase()}
+                          <img
+                            src={getFullImageUrl(admin.profileImage)}
+                            alt="Profile"
+                            class="w-full h-full object-cover rounded-full"
+                            onError$={(event) => {
+                              const target = event.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
                         </div>
                         <div>
                           <span class="font-medium text-gray-800 block">{admin.username}</span>
@@ -373,11 +386,10 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
                       </div>
                     </td>
                     <td class="px-6 py-4">
-                      <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        admin.role === 'superadmin' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
+                      <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${admin.role === 'superadmin'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-blue-100 text-blue-800'
+                        }`}>
                         {admin.role === 'superadmin' ? 'سوپر ادمین' : 'ادمین'}
                       </span>
                     </td>
@@ -437,7 +449,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
               </p>
               <p class="text-sm text-gray-500 mt-2">این عمل غیرقابل بازگشت است.</p>
             </div>
-            
+
             <div class="flex justify-end space-x-3 rtl:space-x-reverse">
               <button
                 onClick$={closeDeleteModal}

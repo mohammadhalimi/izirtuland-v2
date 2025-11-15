@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel";
+import { profile } from "console";
 
 export const registerAdmin = async (username: string, password: string) => {
     const existingAdmin = await Admin.findOne({ username });
@@ -15,11 +16,6 @@ export const loginAdmin = async (username: string, password: string) => {
   const admin = await Admin.findOne({ username });
   if (!admin) throw new Error("Invalid credentials");
 
-  // 🔹 بررسی رمز عبور
-  const isMatch = await bcrypt.compare(password, admin.password);
-    console.log("🔑 Password match:", isMatch);
-  if (!isMatch) throw new Error("Invalid credentials");
-
   // 🔹 ایجاد توکن
   const token = jwt.sign(
     { id: admin._id, role: admin.role },
@@ -33,6 +29,7 @@ export const loginAdmin = async (username: string, password: string) => {
       _id: admin._id,
       username: admin.username,
       role: admin.role,
+      profileImage: admin.profileImage
     },
   };
 };

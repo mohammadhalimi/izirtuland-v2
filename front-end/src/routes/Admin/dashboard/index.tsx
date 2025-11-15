@@ -13,7 +13,8 @@ import EditProfile from '~/components/admin/dashboard/EditProfile';
 interface AdminData {
   _id: string;
   username: string;
-  role:"admin" | "superadmin";
+  role: "admin" | "superadmin";
+  profileImage: string;
 }
 
 // Loader برای چک کردن احراز هویت
@@ -49,6 +50,7 @@ export const useLogoutAction = routeAction$((_, { cookie, redirect }) => {
 
 
 export default component$(() => {
+
   const authData = useAuthCheck();
   const logoutAction = useLogoutAction();
   const sidebarOpen = useSignal(false);
@@ -96,6 +98,13 @@ export default component$(() => {
   // دریافت کامپوننت فعال
   const ActiveComponent = components[activeTab.value as keyof typeof components];
 
+  const getFullImageUrl = (imagePath: string | undefined) => {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+    // اگر مسیر نسبی است، آدرس کامل بسازید
+    return `http://localhost:5000${imagePath}`;
+  };
+
   return (
     <div class="flex h-screen bg-gray-50" dir="rtl">
       {/* Sidebar */}
@@ -142,9 +151,17 @@ export default component$(() => {
 
           {/* User Profile */}
           <div class="p-4 border-t border-gray-200">
-            <div class="flex items-center space-x-3 rtl:space-x-reverse mb-3">
+            <div class="flex items-center space-x-2 mb-3">
               <div class="w-10 h-10 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                {authData.value.admin.username.charAt(0)}
+                <img
+                  src={getFullImageUrl(authData.value.admin.profileImage)}
+                  alt="Profile"
+                  class="w-full h-full object-cover rounded-full"
+                  onError$={(event) => {
+                    const target = event.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-gray-900 truncate">{authData.value.admin.username}</p>
@@ -188,7 +205,15 @@ export default component$(() => {
               </button>
 
               <div class="w-8 h-8 bg-linear-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold cursor-pointer">
-                {authData.value.admin.username.charAt(0)}
+                <img
+                  src={getFullImageUrl(authData.value.admin.profileImage)}
+                  alt="Profile"
+                  class="w-full h-full object-cover rounded-full"
+                  onError$={(event) => {
+                    const target = event.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
               </div>
             </div>
           </div>
