@@ -1,5 +1,5 @@
 // src/routes/admin/dashboard/index.tsx
-import { component$, useSignal, $ } from '@builder.io/qwik';
+import { component$, useSignal, $, useTask$ } from '@builder.io/qwik';
 import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
 
 // ایمپورت کامپوننت‌ها
@@ -9,6 +9,8 @@ import Orders from '~/components/admin/dashboard/Orders';
 import Customers from '~/components/admin/dashboard/Customers';
 import CreateAdmin from '~/components/admin/dashboard/CreateAdmin';
 import EditProfile from '~/components/admin/dashboard/EditProfile';
+import Posts from '~/components/admin/dashboard/Posts';
+
 // Type برای اطلاعات ادمین
 interface AdminData {
   _id: string;
@@ -47,15 +49,25 @@ export const useLogoutAction = routeAction$((_, { cookie, redirect }) => {
   throw redirect(302, '/Admin');
 });
 
-
-
 export default component$(() => {
-
   const authData = useAuthCheck();
   const logoutAction = useLogoutAction();
   const sidebarOpen = useSignal(false);
   const activeTab = useSignal('dashboard');
   const showLogoutModal = useSignal(false);
+
+  // منوی navigation
+  const navItems = [
+    { id: 'dashboard', label: 'داشبورد', icon: '📊' },
+    { id: 'products', label: 'محصولات', icon: '🌿' },
+    { id: 'orders', label: 'سفارشات', icon: '📦' },
+    { id: 'posts', label: 'مدیریت پست‌ها', icon: '📝' },
+    { id: 'CreateAdmin', label: 'ایجاد ادمین', icon: '👨‍💼' },
+    { id: 'EditProfile', label: 'ویرایش پروفایل', icon: '👤' },
+    { id: 'customers', label: 'مشتریان', icon: '👥' },
+    { id: 'analytics', label: 'تحلیل‌ها', icon: '📈' },
+    { id: 'settings', label: 'تنظیمات', icon: '⚙️' }
+  ];
 
   const toggleSidebar = $(() => {
     sidebarOpen.value = !sidebarOpen.value;
@@ -73,35 +85,49 @@ export default component$(() => {
     showLogoutModal.value = false;
   });
 
-  // منوی navigation
-  const navItems = [
-    { id: 'dashboard', label: 'داشبورد', icon: '📊' },
-    { id: 'products', label: 'محصولات', icon: '🌿' },
-    { id: 'orders', label: 'سفارشات', icon: '📦' },
-    { id: 'CreateAdmin', label: 'ایجاد ادمین', icon: '👨‍💼' }, // اضافه شده
-    { id: 'EditProfile', label: 'ویرایش پروفایل', icon: '👤' },
-    { id: 'customers', label: 'مشتریان', icon: '👥' },
-    { id: 'analytics', label: 'تحلیل‌ها', icon: '📈' },
-    { id: 'settings', label: 'تنظیمات', icon: '⚙️' }
-  ];
-  // کامپوننت‌های موجود
-  const components = {
-    dashboard: () => <Dashboard adminName={authData.value.admin.username} />,
-    products: Products,
-    orders: Orders,
-    CreateAdmin: () => <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />,
-    EditProfile: () => <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />,
-    customers: Customers,
-    analytics: () => <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>,
-    settings: () => <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>
-  };
-  // دریافت کامپوننت فعال
-  const ActiveComponent = components[activeTab.value as keyof typeof components];
+  // تابع برای دریافت کامپوننت فعال - داخل component$ تعریف شود
+  const getActiveComponent = $(() => {
+    switch (activeTab.value) {
+      case 'dashboard':
+        return $(() => <Dashboard adminName={authData.value.admin.username} />);
+      case 'products':
+        return Products;
+      case 'orders':
+        return Orders;
+      case 'posts':
+        return Posts;
+      case 'CreateAdmin':
+        return $(() => <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />);
+      case 'EditProfile':
+        return $(() => <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />);
+      case 'customers':
+        return Customers;
+      case 'analytics':
+        return $(() => <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>);
+      case 'settings':
+        return $(() => <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>);
+      default:
+        return $(() => (
+          <div class="p-8 text-center">
+            <div class="text-6xl mb-4">⚠️</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">کامپوننت یافت نشد</h3>
+            <p class="text-gray-600 mb-4">
+              کامپوننت مربوط به "<strong>{activeTab.value}</strong>" وجود ندارد.
+            </p>
+            <button
+              onClick$={() => activeTab.value = 'dashboard'}
+              class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              بازگشت به داشبورد
+            </button>
+          </div>
+        ));
+    }
+  });
 
   const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    // اگر مسیر نسبی است، آدرس کامل بسازید
     return `http://localhost:5000${imagePath}`;
   };
 
@@ -221,7 +247,16 @@ export default component$(() => {
 
         {/* Main Content Area - نمایش کامپوننت فعال */}
         <main class="flex-1 overflow-auto p-6">
-          <ActiveComponent />
+          {/* رندر شرطی کامپوننت‌ها */}
+          {activeTab.value === 'dashboard' && <Dashboard adminName={authData.value.admin.username} />}
+          {activeTab.value === 'products' && <Products />}
+          {activeTab.value === 'orders' && <Orders />}
+          {activeTab.value === 'posts' && <Posts authToken={authData.value.token} />}
+          {activeTab.value === 'CreateAdmin' && <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />}
+          {activeTab.value === 'EditProfile' && <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />}
+          {activeTab.value === 'customers' && <Customers />}
+          {activeTab.value === 'analytics' && <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>}
+          {activeTab.value === 'settings' && <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>}
         </main>
       </div>
 

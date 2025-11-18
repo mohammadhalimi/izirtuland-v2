@@ -5,6 +5,7 @@ import path from "path";
 import { connectDB } from "./config/db";
 
 import authRoutes from "./routes/authRotes";
+import postRoutes from "./routes/postRoutes";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,8 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // routes
 app.use("/api/auth", authRoutes);
+
+app.use("/api/posts", postRoutes);
 
 // connect DB
 connectDB();

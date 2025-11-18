@@ -16,7 +16,7 @@ export default component$(() => {
             <p class="text-gray-300 mb-6 leading-relaxed">
               تأمین کننده تخصصی کودهای شیمیایی، ارگانیک و طبیعی با بیش از ۱۵ سال تجربه در خدمت‌رسانی به کشاورزان و باغداران عزیز
             </p>
-            <div class="flex space-x-4 rtl:space-x-reverse">
+            <div class="flex space-x-4 ">
               <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors duration-300">
                 <span>📱</span>
               </a>
