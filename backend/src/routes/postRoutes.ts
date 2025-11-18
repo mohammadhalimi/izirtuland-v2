@@ -20,5 +20,5 @@ router.get("/", getAllPosts);
 // دریافت یک پست با جزئیات نویسنده
 router.get("/:id", getPostById);
 
-router.delete("/:id",verifyToken,isAdmin, deletePost);
+router.delete("/delete/:id",verifyToken,isAdmin, deletePost);
 export default router;

@@ -20,6 +20,7 @@ export default component$<PostsProps>(({ authToken }) => {
     const formState = useStore({
         title: '',
         content: '',
+        metaDescription: '',
         image: null as File | null
     });
 
@@ -27,6 +28,7 @@ export default component$<PostsProps>(({ authToken }) => {
     const resetForm = $(() => {
         formState.title = '';
         formState.content = '';
+        formState.metaDescription = '';
         formState.image = null;
         previewUrl.value = '';
     });
@@ -45,7 +47,8 @@ export default component$<PostsProps>(({ authToken }) => {
                 // اطمینان از ساختار داده author
                 posts.value = postsData.map(post => ({
                     ...post,
-                    author: post.author || { username: 'نامشخص' }
+                    author: post.author || { username: 'نامشخص' },
+                    metaDescription: post.metaDescription || ''
                 }));
             } else {
                 console.error('Error fetching posts:', response.status);
@@ -69,19 +72,19 @@ export default component$<PostsProps>(({ authToken }) => {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files[0]) {
             const file = input.files[0];
-            
+
             if (!file.type.startsWith('image/')) {
                 showMessage('لطفاً فقط فایل تصویر انتخاب کنید', 'error');
                 return;
             }
-            
+
             if (file.size > 5 * 1024 * 1024) {
                 showMessage('حجم فایل باید کمتر از ۵ مگابایت باشد', 'error');
                 return;
             }
-            
+
             formState.image = file;
-            
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewUrl.value = e.target?.result as string;
@@ -94,7 +97,7 @@ export default component$<PostsProps>(({ authToken }) => {
     const showMessage = $((msg: string, type: 'success' | 'error') => {
         message.value = msg;
         messageType.value = type;
-        
+
         setTimeout(() => {
             message.value = '';
         }, type === 'success' ? 5000 : 3000);
@@ -103,7 +106,7 @@ export default component$<PostsProps>(({ authToken }) => {
     // تابع ایجاد پست جدید
     const handleCreatePost = $(async () => {
         console.log('🟢 شروع ایجاد پست...');
-        
+
         if (!formState.title.trim() || !formState.content.trim()) {
             showMessage('عنوان و محتوای پست الزامی است', 'error');
             return;
@@ -120,7 +123,8 @@ export default component$<PostsProps>(({ authToken }) => {
             const formData = new FormData();
             formData.append('title', formState.title.trim());
             formData.append('content', formState.content.trim());
-            
+            formData.append('metaDescription', formState.metaDescription.trim());
+
             if (formState.image) {
                 formData.append('image', formState.image);
             }
@@ -139,18 +143,19 @@ export default component$<PostsProps>(({ authToken }) => {
 
             if (response.ok) {
                 console.log('✅ پست با موفقیت ایجاد شد');
-                
+
                 // اضافه کردن پست جدید به لیست با ساختار درست author
                 const newPost: Post = {
                     ...data,
-                    author: data.author || { username: 'ادمین' }
+                    author: data.author || { username: 'ادمین' },
+                    metaDescription: data.metaDescription || ''
                 };
-                
+
                 posts.value = [newPost, ...posts.value];
-                
+
                 // ریست فرم
                 resetForm();
-                
+
                 showMessage('🎉 پست جدید با موفقیت ایجاد و منتشر شد!', 'success');
             } else {
                 console.log('❌ خطای API:', data);
@@ -169,7 +174,7 @@ export default component$<PostsProps>(({ authToken }) => {
         isActionLoading.value = true;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/posts/${postId}`, {
+            const response = await fetch(`http://localhost:5000/api/posts/delete/${postId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -220,11 +225,15 @@ export default component$<PostsProps>(({ authToken }) => {
         formState.content = (event.target as HTMLTextAreaElement).value;
     });
 
+    const handleMetaDescriptionInput = $((event: Event) => {
+        formState.metaDescription = (event.target as HTMLTextAreaElement).value;
+    });
+
     // در بخش رندر، حالت لودینگ را اضافه کنید
     if (isLoading.value) {
         return (
             <div class="space-y-6">
-                <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
+                <div class="bg-linear-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold mb-2">مدیریت پست‌ها</h2>
@@ -244,7 +253,7 @@ export default component$<PostsProps>(({ authToken }) => {
     return (
         <div class="space-y-6">
             {/* هدر */}
-            <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
+            <div class="bg-linear-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl font-bold mb-2">مدیریت پست‌ها</h2>
@@ -359,6 +368,34 @@ export default component$<PostsProps>(({ authToken }) => {
                         </div>
                     </div>
 
+                    {/* فیلد متا دیسکریپشن */}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center space-x-2 rtl:space-x-reverse">
+                                <span>توضیحات متا (SEO)</span>
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">اختیاری</span>
+                            </span>
+                        </label>
+                        <textarea
+                            value={formState.metaDescription}
+                            onInput$={handleMetaDescriptionInput}
+                            rows={3}
+                            class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 resize-none"
+                            placeholder="توضیح مختصر و جذاب برای موتورهای جستجو (حداکثر ۱۶۰ کاراکتر)..."
+                            maxLength={160}
+                        />
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-500">ایده‌آل برای سئو: ۱۲۰-۱۶۰ کاراکتر</span>
+                            <span class={`text-xs ${formState.metaDescription.length > 150 ? 'text-orange-500' : 'text-gray-500'
+                                }`}>
+                                {formState.metaDescription.length}/160
+                            </span>
+                        </div>
+                        <p class="text-xs text-blue-500 mt-1">
+                            💡 این توضیح در نتایج جستجوی گوگل نمایش داده می‌شود
+                        </p>
+                    </div>
+
                     {/* فیلد محتوا */}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -377,10 +414,9 @@ export default component$<PostsProps>(({ authToken }) => {
                         />
                         <div class="flex justify-between items-center mt-2">
                             <span class="text-xs text-gray-500">حداقل ۱۰ کاراکتر - حداکثر ۱۰۰۰ کاراکتر</span>
-                            <span class={`text-xs ${
-                                formState.content.length > 800 ? 'text-orange-500' : 
-                                formState.content.length < 10 ? 'text-red-500' : 'text-gray-500'
-                            }`}>
+                            <span class={`text-xs ${formState.content.length > 800 ? 'text-orange-500' :
+                                    formState.content.length < 10 ? 'text-red-500' : 'text-gray-500'
+                                }`}>
                                 {formState.content.length}/1000
                             </span>
                         </div>
@@ -430,7 +466,7 @@ export default component$<PostsProps>(({ authToken }) => {
                             disabled={isActionLoading.value || !formState.title.trim() || !formState.content.trim() || formState.content.trim().length < 10}
                             class={`px-8 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 rtl:space-x-reverse
                                 ${isActionLoading.value || !formState.title.trim() || !formState.content.trim() || formState.content.trim().length < 10
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
                                 }`}
                         >
@@ -456,7 +492,7 @@ export default component$<PostsProps>(({ authToken }) => {
                     <h3 class="text-xl font-bold text-gray-800">پست‌های منتشر شده ({posts.value.length})</h3>
                     <p class="text-gray-600 mt-1">لیست تمام پست‌های ایجاد شده</p>
                 </div>
-                
+
                 {posts.value.length === 0 ? (
                     <div class="text-center py-12">
                         <div class="text-6xl mb-4">📝</div>
@@ -482,7 +518,7 @@ export default component$<PostsProps>(({ authToken }) => {
                                                         target.nextElementSibling?.classList.remove('hidden');
                                                     }}
                                                 />
-                                                <div class="hidden w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                                <div class="hidden w-full h-full bg-gray-100 items-center justify-center text-gray-400">
                                                     📷
                                                 </div>
                                             </div>
@@ -494,16 +530,33 @@ export default component$<PostsProps>(({ authToken }) => {
                                         <h4 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
                                             {post.title}
                                         </h4>
+
+                                        {/* نمایش متا دیسکریپشن اگر وجود داشته باشد */}
+                                        {post.metaDescription && (
+                                            <p class="text-sm text-gray-500 mb-2 line-clamp-2 bg-blue-50 p-2 rounded-lg border border-blue-200">
+                                                <span class="font-medium text-blue-600">SEO:</span> {post.metaDescription}
+                                            </p>
+                                        )}
+
                                         <p class="text-gray-600 mb-3 line-clamp-3">
                                             {post.content}
                                         </p>
 
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center space-x-4 rtl:space-x-reverse text-sm text-gray-500">
-                                                <div class="flex items-center space-x-1 rtl:space-x-reverse">
-                                                    <span>👤</span>
-                                                    <span>{(post.author && post.author.username) || 'ادمین'}</span>
+                                                <div class="flex items-center space-x-4 h-8 w-8">
+                                                    <img
+                                                        src={getFullImageUrl(post.author.profileImage)}
+                                                        alt="Profile"
+                                                        class="w-full h-full object-cover rounded-full"
+                                                        onError$={(event) => {
+                                                            const target = event.target as HTMLImageElement;
+                                                            target.style.display = 'none';
+                                                        }}
+                                                    />
+                                                    
                                                 </div>
+                                                <span>{(post.author && post.author.username) || 'ادمین'}</span>
                                                 {post.createdAt && (
                                                     <div class="flex items-center space-x-1 rtl:space-x-reverse">
                                                         <span>📅</span>

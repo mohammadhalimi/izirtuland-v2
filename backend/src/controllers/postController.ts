@@ -3,7 +3,7 @@ import { Post } from "../models/Post";
 
 export const createPost = async (req: any, res: Response) => {
   try {
-    const { title, content } = req.body;
+    const { title, content , metaDescription } = req.body;
 
     const image = req.file ? "/uploads/" + req.file.filename : null;
 
@@ -11,6 +11,7 @@ export const createPost = async (req: any, res: Response) => {
       title,
       content,
       image,
+      metaDescription,
       author: req.admin.id
     });
 
