@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken, isAdmin } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/upload";
-import { createPost, getAllPosts, getPostById , deletePost } from "../controllers/postController";
+import { createPost, getAllPosts, getPostById , deletePost, getMyPosts } from "../controllers/postController";
 
 const router = express.Router();
 
@@ -16,9 +16,12 @@ router.post(
 
 // دریافت همه پست‌ها
 router.get("/", getAllPosts);
+router.get("/my-posts",verifyToken, isAdmin, getMyPosts);
 
 // دریافت یک پست با جزئیات نویسنده
 router.get("/:id", getPostById);
 
+
 router.delete("/delete/:id",verifyToken,isAdmin, deletePost);
+
 export default router;

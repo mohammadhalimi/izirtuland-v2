@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Post } from "../models/Post";
+import { AuthRequest } from "../middlewares/authMiddleware";
 
 export const createPost = async (req: any, res: Response) => {
   try {
@@ -81,5 +82,22 @@ export const deletePost = async (req: any, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getMyPosts = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.admin) return res.status(403).json({ message: "دسترسی غیرمجاز" });
+
+    console.log("🔹 Current admin id:", req.admin.id);
+
+    const posts = await Post.find({ author: req.admin.id }).sort({ createdAt: -1 });
+
+    console.log(`📦 Found ${posts.length} posts for this admin`);
+
+    res.status(200).json({ posts });
+  } catch (error) {
+    console.error("❌ Error fetching my posts:", error);
+    res.status(500).json({ message: "خطا در دریافت پست‌ها" });
   }
 };

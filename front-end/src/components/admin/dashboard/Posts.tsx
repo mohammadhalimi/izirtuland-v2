@@ -1,4 +1,3 @@
-// src/components/admin/dashboard/Posts.tsx
 import { component$, useSignal, useTask$, useStore, $ } from '@builder.io/qwik';
 import type { Post } from '~/components/types/posts';
 
@@ -15,7 +14,8 @@ export default component$<PostsProps>(({ authToken }) => {
     const message = useSignal('');
     const messageType = useSignal<'success' | 'error'>('success');
     const previewUrl = useSignal('');
-    const newTag = useSignal(''); // ⭐ جدید: برای input تگ جدید
+    const newTag = useSignal('');
+    const errorMessage = useSignal('');
 
     // استفاده از useStore برای state فرم
     const formState = useStore({
@@ -23,7 +23,7 @@ export default component$<PostsProps>(({ authToken }) => {
         content: '',
         metaDescription: '',
         image: null as File | null,
-        tags: [] as string[] // ⭐ جدید: آرایه تگ‌ها
+        tags: [] as string[]
     });
 
     // تابع ریست فرم
@@ -32,16 +32,15 @@ export default component$<PostsProps>(({ authToken }) => {
         formState.content = '';
         formState.metaDescription = '';
         formState.image = null;
-        formState.tags = []; // ⭐ جدید: پاک کردن تگ‌ها
+        formState.tags = [];
         previewUrl.value = '';
-        newTag.value = ''; // ⭐ جدید: پاک کردن input تگ
+        newTag.value = '';
     });
 
-    // دریافت پست‌ها هنگام لود کامپوننت
-    // آپدیت useTask$ برای دریافت پست‌ها
+    // دریافت پست‌های کاربر جاری از endpoint جدید
     useTask$(async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/posts', {
+            const response = await fetch('http://localhost:5000/api/posts/my-posts', {
                 headers: {
                     'Authorization': `Bearer ${authToken}`
                 }
@@ -49,28 +48,36 @@ export default component$<PostsProps>(({ authToken }) => {
 
             if (response.ok) {
                 const postsData = await response.json();
+                console.log('📦 داده‌های دریافتی از my-posts:', postsData);
 
-                // توجه: اگر API آرایه مستقیم برمی‌گرداند از postsData استفاده کنید
-                // اگر درون یک آبجکت است از postsData.posts استفاده کنید
+                // پردازش داده‌های دریافتی
                 const postsArray = Array.isArray(postsData) ? postsData : (postsData.posts || postsData.data || []);
 
                 posts.value = postsArray.map((post: any) => ({
                     ...post,
-                    author: post.author || { username: 'نامشخص' },
+                    author: post.author || { username: 'شما' },
                     metaDescription: post.metaDescription || '',
-                    tags: Array.isArray(post.tags) ? post.tags : []
+                    tags: Array.isArray(post.tags) ? post.tags : [],
+                    createdAt: post.createdAt || new Date().toISOString()
                 }));
+
+                console.log('✅ پست‌های پردازش شده:', posts.value);
+
             } else {
                 console.error('Error fetching posts:', response.status);
+                const errorText = await response.text();
+                console.error('متن خطا:', errorText);
+                errorMessage.value = 'خطا در دریافت پست‌های شما';
             }
         } catch (error) {
             console.error('Error fetching posts:', error);
+            errorMessage.value = 'خطا در ارتباط با سرور';
         } finally {
             isLoading.value = false;
         }
     });
 
-    // ⭐ جدید: تابع اضافه کردن تگ
+    // تابع اضافه کردن تگ
     const addTag = $(() => {
         const tag = newTag.value.trim();
         if (tag && !formState.tags.includes(tag)) {
@@ -79,12 +86,12 @@ export default component$<PostsProps>(({ authToken }) => {
         }
     });
 
-    // ⭐ جدید: تابع حذف تگ
+    // تابع حذف تگ
     const removeTag = $((index: number) => {
         formState.tags = formState.tags.filter((_, i) => i !== index);
     });
 
-    // ⭐ جدید: تابع مدیریت کلید Enter در input تگ
+    // تابع مدیریت کلید Enter در input تگ
     const handleTagKeyPress = $((event: KeyboardEvent) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -136,7 +143,6 @@ export default component$<PostsProps>(({ authToken }) => {
     });
 
     // تابع ایجاد پست جدید
-    // آپدیت تابع handleCreatePost
     const handleCreatePost = $(async () => {
         console.log('🟢 شروع ایجاد پست...');
 
@@ -162,19 +168,12 @@ export default component$<PostsProps>(({ authToken }) => {
                 formData.append('image', formState.image);
             }
 
-            console.log('📤 ارسال FormData...');
-
-            // لاگ کردن محتوای FormData برای دیباگ
-            for (let [key, value] of formData.entries()) {
-                console.log(`  ${key}:`, value);
-            }
+            console.log('📤 ارسال FormData به /api/posts/create...');
 
             const response = await fetch('http://localhost:5000/api/posts/create', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
-                    // نکته مهم: برای FormData نباید Content-Type ست شود
-                    // مرورگر به طور خودکار boundary را اضافه می‌کند
                 },
                 body: formData
             });
@@ -193,14 +192,19 @@ export default component$<PostsProps>(({ authToken }) => {
 
             // تبدیل تگ‌های string برگشتی به آرایه
             const newPost: Post = {
-                ...data.post, // ⭐ توجه: داده در data.post قرار دارد
-                author: data.post.author || { username: 'ادمین' },
+                ...data.post,
+                author: data.post.author || { username: 'شما' },
                 metaDescription: data.post.metaDescription || '',
-                tags: Array.isArray(data.post.tags) ? data.post.tags : []
+                tags: Array.isArray(data.post.tags) ? data.post.tags : [],
+                createdAt: data.post.createdAt || new Date().toISOString()
             };
 
+            // اضافه کردن پست جدید به لیست
             posts.value = [newPost, ...posts.value];
+            
+            // ریست فرم
             resetForm();
+            
             showMessage('🎉 پست جدید با موفقیت ایجاد شد!', 'success');
 
         } catch (error: any) {
@@ -211,7 +215,6 @@ export default component$<PostsProps>(({ authToken }) => {
         }
     });
 
-    // تابع حذف پست
     // تابع حذف پست
     const handleDeletePost = $(async (postId: string) => {
         isActionLoading.value = true;
@@ -276,7 +279,7 @@ export default component$<PostsProps>(({ authToken }) => {
         formState.metaDescription = (event.target as HTMLTextAreaElement).value;
     });
 
-    // ⭐ جدید: event handler برای input تگ
+    // event handler برای input تگ
     const handleTagInput = $((event: Event) => {
         newTag.value = (event.target as HTMLInputElement).value;
     });
@@ -288,7 +291,7 @@ export default component$<PostsProps>(({ authToken }) => {
                 <div class="bg-linear-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-2xl font-bold mb-2">مدیریت پست‌ها</h2>
+                            <h2 class="text-2xl font-bold mb-2">مدیریت پست‌های من</h2>
                             <p class="opacity-90">در حال بارگذاری...</p>
                         </div>
                         <div class="text-4xl">📝</div>
@@ -296,7 +299,7 @@ export default component$<PostsProps>(({ authToken }) => {
                 </div>
                 <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-12 text-center">
                     <div class="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p class="text-gray-600">در حال بارگذاری پست‌ها...</p>
+                    <p class="text-gray-600">در حال بارگذاری پست‌های شما...</p>
                 </div>
             </div>
         );
@@ -308,12 +311,24 @@ export default component$<PostsProps>(({ authToken }) => {
             <div class="bg-linear-to-r from-emerald-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold mb-2">مدیریت پست‌ها</h2>
-                        <p class="opacity-90">ایجاد و مدیریت محتوای وبسایت کودهای کشاورزی</p>
+                        <h2 class="text-2xl font-bold mb-2">مدیریت پست‌های من</h2>
+                        <p class="opacity-90">ایجاد و مدیریت پست‌های شخصی شما</p>
                     </div>
                     <div class="text-4xl">📝</div>
                 </div>
             </div>
+
+            {/* نمایش خطا */}
+            {errorMessage.value && (
+                <div class="p-4 bg-red-50 text-red-800 rounded-2xl border border-red-200">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 ml-3">
+                            ❌
+                        </div>
+                        <p>{errorMessage.value}</p>
+                    </div>
+                </div>
+            )}
 
             {/* آمار و اقدامات */}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -322,7 +337,7 @@ export default component$<PostsProps>(({ authToken }) => {
                         📝
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-1">{posts.value.length}</h3>
-                    <p class="text-green-600 font-medium">تعداد پست‌ها</p>
+                    <p class="text-green-600 font-medium">پست‌های من</p>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6 text-center">
@@ -443,12 +458,9 @@ export default component$<PostsProps>(({ authToken }) => {
                                 {formState.metaDescription.length}/160
                             </span>
                         </div>
-                        <p class="text-xs text-blue-500 mt-1">
-                            💡 این توضیح در نتایج جستجوی گوگل نمایش داده می‌شود
-                        </p>
                     </div>
 
-                    {/* ⭐ جدید: فیلد تگ‌ها */}
+                    {/* فیلد تگ‌ها */}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             <span class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -476,7 +488,7 @@ export default component$<PostsProps>(({ authToken }) => {
                         )}
 
                         {/* input برای اضافه کردن تگ جدید */}
-                        <div class="flex space-x-2 rtl:space-x-reverse">
+                        <div class="flex space-x-2">
                             <input
                                 type="text"
                                 value={newTag.value}
@@ -490,7 +502,7 @@ export default component$<PostsProps>(({ authToken }) => {
                                 type="button"
                                 onClick$={addTag}
                                 disabled={!newTag.value.trim()}
-                                class={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${!newTag.value.trim()
+                                class={`px-4 py-3 rounded-xl font-medium transition-all cursor-pointer duration-200 ${!newTag.value.trim()
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     : 'bg-green-600 text-white hover:bg-green-700'
                                     }`}
@@ -498,15 +510,6 @@ export default component$<PostsProps>(({ authToken }) => {
                                 اضافه
                             </button>
                         </div>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs text-gray-500">حداکثر ۲۰ کاراکتر برای هر تگ</span>
-                            <span class="text-xs text-gray-500">
-                                {formState.tags.length} تگ
-                            </span>
-                        </div>
-                        <p class="text-xs text-blue-500 mt-1">
-                            💡 تگ‌ها به دسته‌بندی و جستجوی بهتر پست‌ها کمک می‌کنند
-                        </p>
                     </div>
 
                     {/* فیلد محتوا */}
@@ -549,9 +552,6 @@ export default component$<PostsProps>(({ authToken }) => {
                             onChange$={handleFileSelect}
                             class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
                         />
-                        <p class="text-xs text-gray-500 mt-1">
-                            فرمت‌های مجاز: JPG, PNG, GIF • حداکثر حجم: ۵ مگابایت
-                        </p>
 
                         {/* پیش‌نمایش عکس */}
                         {previewUrl.value && (
@@ -567,17 +567,17 @@ export default component$<PostsProps>(({ authToken }) => {
                     </div>
 
                     {/* دکمه‌های اقدام */}
-                    <div class="flex justify-end space-x-3 rtl:space-x-reverse pt-4 border-t border-gray-200">
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
                         <button
                             onClick$={resetForm}
-                            class="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium border border-gray-300"
+                            class="px-6 py-3 text-gray-600 cursor-pointer hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium border border-gray-300"
                         >
                             پاک کردن فرم
                         </button>
                         <button
                             onClick$={handleCreatePost}
                             disabled={isActionLoading.value || !formState.title.trim() || !formState.content.trim() || formState.content.trim().length < 10}
-                            class={`px-8 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 rtl:space-x-reverse
+                            class={`px-8 py-3 rounded-xl cursor-pointer font-medium transition-all duration-200 flex items-center space-x-2 rtl:space-x-reverse
                                 ${isActionLoading.value || !formState.title.trim() || !formState.content.trim() || formState.content.trim().length < 10
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
@@ -599,17 +599,17 @@ export default component$<PostsProps>(({ authToken }) => {
                 </div>
             </div>
 
-            {/* لیست پست‌ها */}
+            {/* لیست پست‌های من */}
             <div class="bg-white rounded-2xl shadow-lg border border-green-200 overflow-hidden">
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-800">پست‌های منتشر شده ({posts.value.length})</h3>
-                    <p class="text-gray-600 mt-1">لیست تمام پست‌های ایجاد شده</p>
+                    <h3 class="text-xl font-bold text-gray-800">پست‌های من ({posts.value.length})</h3>
+                    <p class="text-gray-600 mt-1">لیست پست‌های ایجاد شده توسط شما</p>
                 </div>
 
                 {posts.value.length === 0 ? (
                     <div class="text-center py-12">
                         <div class="text-6xl mb-4">📝</div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">هنوز پستی وجود ندارد</h3>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">هنوز پستی ایجاد نکرده‌اید</h3>
                         <p class="text-gray-600">اولین پست خود را با استفاده از فرم بالا ایجاد کنید</p>
                     </div>
                 ) : (
@@ -644,7 +644,7 @@ export default component$<PostsProps>(({ authToken }) => {
                                             {post.title}
                                         </h4>
 
-                                        {/* ⭐ جدید: نمایش تگ‌ها */}
+                                        {/* نمایش تگ‌ها */}
                                         {post.tags && post.tags.length > 0 && (
                                             <div class="flex flex-wrap gap-2 mb-2">
                                                 {post.tags.map((tag, index) => (
@@ -658,7 +658,7 @@ export default component$<PostsProps>(({ authToken }) => {
                                             </div>
                                         )}
 
-                                        {/* نمایش متا دیسکریپشن اگر وجود داشته باشد */}
+                                        {/* نمایش متا دیسکریپشن */}
                                         {post.metaDescription && (
                                             <p class="text-sm text-gray-500 mb-2 line-clamp-2 bg-blue-50 p-2 rounded-lg border border-blue-200">
                                                 <span class="font-medium text-blue-600">SEO:</span> {post.metaDescription}
@@ -671,19 +671,7 @@ export default component$<PostsProps>(({ authToken }) => {
 
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center space-x-4 rtl:space-x-reverse text-sm text-gray-500">
-                                                <div class="flex items-center space-x-4 h-8 w-8">
-                                                    <img
-                                                        src={getFullImageUrl(post.author.profileImage)}
-                                                        alt="Profile"
-                                                        class="w-full h-full object-cover rounded-full"
-                                                        onError$={(event) => {
-                                                            const target = event.target as HTMLImageElement;
-                                                            target.style.display = 'none';
-                                                        }}
-                                                    />
-
-                                                </div>
-                                                <span>{(post.author && post.author.username) || 'ادمین'}</span>
+                                                <span>{(post.author && post.author.username) || 'شما'}</span>
                                                 {post.createdAt && (
                                                     <div class="flex items-center space-x-1 rtl:space-x-reverse">
                                                         <span>📅</span>
