@@ -3,7 +3,7 @@ import { Post } from "../models/Post";
 
 export const createPost = async (req: any, res: Response) => {
   try {
-    const { title, content , metaDescription } = req.body;
+    const { title, content , metaDescription , tags } = req.body;
 
     const image = req.file ? "/uploads/" + req.file.filename : null;
 
@@ -12,6 +12,7 @@ export const createPost = async (req: any, res: Response) => {
       content,
       image,
       metaDescription,
+      tags: tags ? tags.split(",") : [], // اگر کاربر با کاما بفرستد
       author: req.admin.id
     });
 

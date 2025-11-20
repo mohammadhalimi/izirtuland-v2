@@ -15,13 +15,15 @@ export default component$<PostsProps>(({ authToken }) => {
     const message = useSignal('');
     const messageType = useSignal<'success' | 'error'>('success');
     const previewUrl = useSignal('');
+    const newTag = useSignal(''); // ⭐ جدید: برای input تگ جدید
 
     // استفاده از useStore برای state فرم
     const formState = useStore({
         title: '',
         content: '',
         metaDescription: '',
-        image: null as File | null
+        image: null as File | null,
+        tags: [] as string[] // ⭐ جدید: آرایه تگ‌ها
     });
 
     // تابع ریست فرم
@@ -30,10 +32,13 @@ export default component$<PostsProps>(({ authToken }) => {
         formState.content = '';
         formState.metaDescription = '';
         formState.image = null;
+        formState.tags = []; // ⭐ جدید: پاک کردن تگ‌ها
         previewUrl.value = '';
+        newTag.value = ''; // ⭐ جدید: پاک کردن input تگ
     });
 
     // دریافت پست‌ها هنگام لود کامپوننت
+    // آپدیت useTask$ برای دریافت پست‌ها
     useTask$(async () => {
         try {
             const response = await fetch('http://localhost:5000/api/posts', {
@@ -43,12 +48,17 @@ export default component$<PostsProps>(({ authToken }) => {
             });
 
             if (response.ok) {
-                const postsData: Post[] = await response.json();
-                // اطمینان از ساختار داده author
-                posts.value = postsData.map(post => ({
+                const postsData = await response.json();
+
+                // توجه: اگر API آرایه مستقیم برمی‌گرداند از postsData استفاده کنید
+                // اگر درون یک آبجکت است از postsData.posts استفاده کنید
+                const postsArray = Array.isArray(postsData) ? postsData : (postsData.posts || postsData.data || []);
+
+                posts.value = postsArray.map((post: any) => ({
                     ...post,
                     author: post.author || { username: 'نامشخص' },
-                    metaDescription: post.metaDescription || ''
+                    metaDescription: post.metaDescription || '',
+                    tags: Array.isArray(post.tags) ? post.tags : []
                 }));
             } else {
                 console.error('Error fetching posts:', response.status);
@@ -57,6 +67,28 @@ export default component$<PostsProps>(({ authToken }) => {
             console.error('Error fetching posts:', error);
         } finally {
             isLoading.value = false;
+        }
+    });
+
+    // ⭐ جدید: تابع اضافه کردن تگ
+    const addTag = $(() => {
+        const tag = newTag.value.trim();
+        if (tag && !formState.tags.includes(tag)) {
+            formState.tags = [...formState.tags, tag];
+            newTag.value = '';
+        }
+    });
+
+    // ⭐ جدید: تابع حذف تگ
+    const removeTag = $((index: number) => {
+        formState.tags = formState.tags.filter((_, i) => i !== index);
+    });
+
+    // ⭐ جدید: تابع مدیریت کلید Enter در input تگ
+    const handleTagKeyPress = $((event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addTag();
         }
     });
 
@@ -104,16 +136,12 @@ export default component$<PostsProps>(({ authToken }) => {
     });
 
     // تابع ایجاد پست جدید
+    // آپدیت تابع handleCreatePost
     const handleCreatePost = $(async () => {
         console.log('🟢 شروع ایجاد پست...');
 
         if (!formState.title.trim() || !formState.content.trim()) {
             showMessage('عنوان و محتوای پست الزامی است', 'error');
-            return;
-        }
-
-        if (formState.content.trim().length < 10) {
-            showMessage('محتوای پست باید حداقل ۱۰ کاراکتر باشد', 'error');
             return;
         }
 
@@ -125,50 +153,65 @@ export default component$<PostsProps>(({ authToken }) => {
             formData.append('content', formState.content.trim());
             formData.append('metaDescription', formState.metaDescription.trim());
 
+            // تبدیل تگ‌ها به string با جداکننده کاما
+            const tagsString = formState.tags.join(',');
+            formData.append('tags', tagsString);
+
+            // اضافه کردن عکس اگر وجود دارد
             if (formState.image) {
                 formData.append('image', formState.image);
             }
 
-            console.log('📤 ارسال درخواست به API...');
+            console.log('📤 ارسال FormData...');
+
+            // لاگ کردن محتوای FormData برای دیباگ
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}:`, value);
+            }
+
             const response = await fetch('http://localhost:5000/api/posts/create', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
+                    // نکته مهم: برای FormData نباید Content-Type ست شود
+                    // مرورگر به طور خودکار boundary را اضافه می‌کند
                 },
                 body: formData
             });
 
-            const data = await response.json();
-            console.log('📦 پاسخ API:', data);
+            console.log('📨 وضعیت پاسخ:', response.status, response.statusText);
 
-            if (response.ok) {
-                console.log('✅ پست با موفقیت ایجاد شد');
+            const responseText = await response.text();
+            console.log('📦 پاسخ خام:', responseText);
 
-                // اضافه کردن پست جدید به لیست با ساختار درست author
-                const newPost: Post = {
-                    ...data,
-                    author: data.author || { username: 'ادمین' },
-                    metaDescription: data.metaDescription || ''
-                };
-
-                posts.value = [newPost, ...posts.value];
-
-                // ریست فرم
-                resetForm();
-
-                showMessage('🎉 پست جدید با موفقیت ایجاد و منتشر شد!', 'success');
-            } else {
-                console.log('❌ خطای API:', data);
-                showMessage(data.message || 'خطا در ایجاد پست', 'error');
+            if (!response.ok) {
+                throw new Error(`خطای سرور: ${response.status} - ${responseText}`);
             }
+
+            const data = JSON.parse(responseText);
+            console.log('✅ پست با موفقیت ایجاد شد:', data);
+
+            // تبدیل تگ‌های string برگشتی به آرایه
+            const newPost: Post = {
+                ...data.post, // ⭐ توجه: داده در data.post قرار دارد
+                author: data.post.author || { username: 'ادمین' },
+                metaDescription: data.post.metaDescription || '',
+                tags: Array.isArray(data.post.tags) ? data.post.tags : []
+            };
+
+            posts.value = [newPost, ...posts.value];
+            resetForm();
+            showMessage('🎉 پست جدید با موفقیت ایجاد شد!', 'success');
+
         } catch (error: any) {
-            console.error('❌ خطای شبکه:', error);
-            showMessage('خطا در ارتباط با سرور', 'error');
+            console.error('❌ خطا:', error);
+            showMessage(`خطا در ایجاد پست: ${error.message}`, 'error');
         } finally {
             isActionLoading.value = false;
         }
     });
 
+    // تابع حذف پست
     // تابع حذف پست
     const handleDeletePost = $(async (postId: string) => {
         isActionLoading.value = true;
@@ -181,16 +224,20 @@ export default component$<PostsProps>(({ authToken }) => {
                 }
             });
 
+            const responseText = await response.text();
+
             if (response.ok) {
+                const data = JSON.parse(responseText);
                 // حذف پست از لیست
                 posts.value = posts.value.filter(post => post._id !== postId);
                 showDeleteModal.value = false;
-                showMessage('🗑️ پست با موفقیت حذف شد', 'success');
+                showMessage(data.message || '🗑️ پست با موفقیت حذف شد', 'success');
             } else {
-                const data = await response.json();
+                const data = JSON.parse(responseText);
                 showMessage(data.message || 'خطا در حذف پست', 'error');
             }
         } catch (error: any) {
+            console.error('خطا در حذف پست:', error);
             showMessage('خطا در ارتباط با سرور', 'error');
         } finally {
             isActionLoading.value = false;
@@ -227,6 +274,11 @@ export default component$<PostsProps>(({ authToken }) => {
 
     const handleMetaDescriptionInput = $((event: Event) => {
         formState.metaDescription = (event.target as HTMLTextAreaElement).value;
+    });
+
+    // ⭐ جدید: event handler برای input تگ
+    const handleTagInput = $((event: Event) => {
+        newTag.value = (event.target as HTMLInputElement).value;
     });
 
     // در بخش رندر، حالت لودینگ را اضافه کنید
@@ -331,7 +383,7 @@ export default component$<PostsProps>(({ authToken }) => {
                 </div>
             )}
 
-            {/* فرم ایجاد پست جدید - همیشه نمایش داده می‌شود */}
+            {/* فرم ایجاد پست جدید */}
             <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6">
                 <div class="mb-6">
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -396,6 +448,67 @@ export default component$<PostsProps>(({ authToken }) => {
                         </p>
                     </div>
 
+                    {/* ⭐ جدید: فیلد تگ‌ها */}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center space-x-2 rtl:space-x-reverse">
+                                <span>تگ‌ها</span>
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">اختیاری</span>
+                            </span>
+                        </label>
+
+                        {/* نمایش تگ‌های اضافه شده */}
+                        {formState.tags.length > 0 && (
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                {formState.tags.map((tag, index) => (
+                                    <div key={index} class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center space-x-2 rtl:space-x-reverse">
+                                        <span>#{tag}</span>
+                                        <button
+                                            type="button"
+                                            onClick$={() => removeTag(index)}
+                                            class="text-green-600 hover:text-green-800 text-xs"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* input برای اضافه کردن تگ جدید */}
+                        <div class="flex space-x-2 rtl:space-x-reverse">
+                            <input
+                                type="text"
+                                value={newTag.value}
+                                onInput$={handleTagInput}
+                                onKeyPress$={handleTagKeyPress}
+                                class="flex-1 px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                                placeholder="تگ جدید را وارد کنید (Enter برای اضافه کردن)"
+                                maxLength={20}
+                            />
+                            <button
+                                type="button"
+                                onClick$={addTag}
+                                disabled={!newTag.value.trim()}
+                                class={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${!newTag.value.trim()
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-green-600 text-white hover:bg-green-700'
+                                    }`}
+                            >
+                                اضافه
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-500">حداکثر ۲۰ کاراکتر برای هر تگ</span>
+                            <span class="text-xs text-gray-500">
+                                {formState.tags.length} تگ
+                            </span>
+                        </div>
+                        <p class="text-xs text-blue-500 mt-1">
+                            💡 تگ‌ها به دسته‌بندی و جستجوی بهتر پست‌ها کمک می‌کنند
+                        </p>
+                    </div>
+
                     {/* فیلد محتوا */}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -415,7 +528,7 @@ export default component$<PostsProps>(({ authToken }) => {
                         <div class="flex justify-between items-center mt-2">
                             <span class="text-xs text-gray-500">حداقل ۱۰ کاراکتر - حداکثر ۱۰۰۰ کاراکتر</span>
                             <span class={`text-xs ${formState.content.length > 800 ? 'text-orange-500' :
-                                    formState.content.length < 10 ? 'text-red-500' : 'text-gray-500'
+                                formState.content.length < 10 ? 'text-red-500' : 'text-gray-500'
                                 }`}>
                                 {formState.content.length}/1000
                             </span>
@@ -531,6 +644,20 @@ export default component$<PostsProps>(({ authToken }) => {
                                             {post.title}
                                         </h4>
 
+                                        {/* ⭐ جدید: نمایش تگ‌ها */}
+                                        {post.tags && post.tags.length > 0 && (
+                                            <div class="flex flex-wrap gap-2 mb-2">
+                                                {post.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                                                    >
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         {/* نمایش متا دیسکریپشن اگر وجود داشته باشد */}
                                         {post.metaDescription && (
                                             <p class="text-sm text-gray-500 mb-2 line-clamp-2 bg-blue-50 p-2 rounded-lg border border-blue-200">
@@ -554,7 +681,7 @@ export default component$<PostsProps>(({ authToken }) => {
                                                             target.style.display = 'none';
                                                         }}
                                                     />
-                                                    
+
                                                 </div>
                                                 <span>{(post.author && post.author.username) || 'ادمین'}</span>
                                                 {post.createdAt && (

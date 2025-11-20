@@ -9,6 +9,7 @@ export interface Post {
     username: string;
     profileImage?: string;
   };
+  tags: string[];
   createdAt?: string;
   updatedAt?: string;
 }
