@@ -41,9 +41,9 @@ export default component$(() => {
                 <Link href="/pesticides" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">سموم کشاورزی</Link>
               </div>
             </div>
-            <Link href="/blog" class="text-gray-700 hover:text-green-600 transition-colors duration-200">وبلاگ</Link>
-            <Link href="/about" class="text-gray-700 hover:text-green-600 transition-colors duration-200">درباره ما</Link>
-            <Link href="/contact" class="text-gray-700 hover:text-green-600 transition-colors duration-200">تماس</Link>
+            <Link href="/Blog" class="text-gray-700 hover:text-green-600 transition-colors duration-200">وبلاگ</Link>
+            <Link href="/About" class="text-gray-700 hover:text-green-600 transition-colors duration-200">درباره ما</Link>
+            <Link href="/Contact" class="text-gray-700 hover:text-green-600 transition-colors duration-200">تماس</Link>
           </nav>
 
           {/* آیکون‌های سمت چپ */}
