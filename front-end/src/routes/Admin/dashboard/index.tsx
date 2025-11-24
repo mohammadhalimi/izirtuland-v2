@@ -1,5 +1,5 @@
 // src/routes/admin/dashboard/index.tsx
-import { component$, useSignal, $, useTask$ } from '@builder.io/qwik';
+import { component$, useSignal, $ } from '@builder.io/qwik';
 import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
 
 // ایمپورت کامپوننت‌ها
@@ -10,6 +10,7 @@ import Customers from '~/components/admin/dashboard/Customers';
 import CreateAdmin from '~/components/admin/dashboard/CreateAdmin';
 import EditProfile from '~/components/admin/dashboard/EditProfile';
 import Posts from '~/components/admin/dashboard/Posts';
+import ProductManager from '~/components/admin/dashboard/ProductManager';
 
 // Type برای اطلاعات ادمین
 interface AdminData {
@@ -61,6 +62,7 @@ export default component$(() => {
     { id: 'dashboard', label: 'داشبورد', icon: '📊' },
     { id: 'products', label: 'محصولات', icon: '🌿' },
     { id: 'orders', label: 'سفارشات', icon: '📦' },
+    { id: 'product-manager', label: 'مدیریت محصولات', icon: '🛍️' }, // اضافه شد
     { id: 'posts', label: 'مدیریت پست‌ها', icon: '📝' },
     { id: 'CreateAdmin', label: 'ایجاد ادمین', icon: '👨‍💼' },
     { id: 'EditProfile', label: 'ویرایش پروفایل', icon: '👤' },
@@ -257,6 +259,7 @@ export default component$(() => {
           {activeTab.value === 'customers' && <Customers />}
           {activeTab.value === 'analytics' && <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>}
           {activeTab.value === 'settings' && <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>}
+          {activeTab.value === 'product-manager' && <ProductManager authToken={authData.value.token} />}
         </main>
       </div>
 

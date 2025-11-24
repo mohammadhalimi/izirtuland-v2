@@ -1,5 +1,4 @@
 import { component$, useResource$, Resource } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
 import type { Post } from '~/components/types/posts';
 
 export default component$(() => {
