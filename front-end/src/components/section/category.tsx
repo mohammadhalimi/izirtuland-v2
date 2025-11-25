@@ -15,6 +15,14 @@ const categories = [
     icon: '🌿',
     href: '/products',
     description: 'کمپوست، ورمی کمپوست، کود دامی'
+  },
+  {
+    id: 3,
+    name: 'سموم کشاورزی',
+    icon: '🐛',
+    href: '/products',
+    description: 'حشره‌کش، قارچ‌کش، علف‌کش',
+    color: 'from-red-500 to-red-600'
   }
 ];
 
@@ -25,10 +33,10 @@ export default component$(() => {
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
           دسته‌بندی محصولات
         </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <Link 
+            <Link
               key={category.id}
               href={category.href}
               class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 text-center group hover-lift"

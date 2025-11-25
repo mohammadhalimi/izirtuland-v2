@@ -18,7 +18,9 @@ export default component$(() => {
         { name: 'ISO 9001', description: 'سیستم مدیریت کیفیت', icon: '🏆' },
         { name: 'ISO 14001', description: 'سیستم مدیریت محیط زیست', icon: '🌱' },
         { name: 'گواهی سلامت', description: 'سازمان غذا و دارو', icon: '✅' },
-        { name: 'استاندارد ملی', description: 'ایران', icon: '🇮🇷' }
+        { name: 'استاندارد ملی', description: 'ایران', icon: '🇮🇷' },
+        { name: 'Oxford Certified', description: 'تایید شده توسط دانشگاه آکسفورد', icon: '🎓'},
+        { name: 'California Certified', description: 'تایید شده توسط دانشگاه کالیفرنیا', icon: '🌉'},
     ];
 
     return (
@@ -51,7 +53,7 @@ export default component$(() => {
                                 <a href='/products' class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
                                     🛒 مشاهده محصولات
                                 </a>
-                                <a href='/contact' class="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
+                                <a href='/Contact' class="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
                                     📞 تماس با ما
                                 </a>
                             </div>
@@ -59,13 +61,13 @@ export default component$(() => {
 
                         {/* جای عکس */}
                         <div class="relative">
-                                    <img
-                                        src={logoC}
-                                        alt="My SVG"
-                                        height={100} width={100} loading="eager"
-                                        decoding="async"
-                                        class="w-full h-auto object-cover"
-                                    />
+                            <img
+                                src={logoC}
+                                alt="My SVG"
+                                height={100} width={100} loading="eager"
+                                decoding="async"
+                                class="w-full h-auto object-cover"
+                            />
                             <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-yellow-400 rounded-2xl rotate-12 opacity-20"></div>
                             <div class="absolute -top-6 -right-6 w-20 h-20 bg-green-300 rounded-2xl -rotate-12 opacity-30"></div>
                         </div>

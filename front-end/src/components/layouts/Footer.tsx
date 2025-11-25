@@ -7,15 +7,14 @@ export default component$(() => {
       {/* Main Footer */}
       <div class="container mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
+
           {/* Column 1: About */}
           <div class="lg:col-span-1">
             <div class="flex items-center mb-6">
               <div class="text-2xl font-bold text-green-400">پربار باغستان</div>
             </div>
-            <p class="text-gray-300 mb-6 leading-relaxed">
-              تأمین کننده تخصصی کودهای شیمیایی، ارگانیک و طبیعی با بیش از ۱۵ سال تجربه در خدمت‌رسانی به کشاورزان و باغداران عزیز
-            </p>
+            <p class="text-gray-300 mb-6 leading-relaxed text-justify">
+              شرکت تولیدی پربار باغستان (سهامی خاص) در سال ۱۳۸۵ با تولید کودهای گرانوله شیمیایی و ارگانیک فعالیت خود را آغاز نمود.            </p>
             <div class="flex space-x-4 ">
               <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors duration-300">
                 <span>📱</span>
@@ -174,18 +173,9 @@ export default component$(() => {
             <div class="text-gray-400 text-sm mb-4 md:mb-0">
               © ۱۴۰۲ پربار باغستان. تمام حقوق محفوظ است.
             </div>
-            <div class="flex flex-wrap justify-center gap-6 text-sm">
-              <Link href="/privacy" class="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                حریم خصوصی
-              </Link>
-              <Link href="/terms" class="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                شرایط استفاده
-              </Link>
-              <Link href="/return" class="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                شرایط بازگشت
-              </Link>
-              <Link href="/sitemap" class="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                نقشه سایت
+            <div class="flex flex-wrap justify-center text-sm">
+              <Link href="https://mohammadhalimi.ir/" class="text-gray-400 hover:text-green-400 transition-colors duration-300">
+                طراحی و ساخت توسط mohammad halimi
               </Link>
             </div>
           </div>
