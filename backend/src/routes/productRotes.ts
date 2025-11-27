@@ -13,9 +13,15 @@ router.post(
   createProduct
 );
 
-router.get("/" , getProduct)
+router.get("/" , getProduct);
 
-router.delete("/delete" , verifyToken , isAdmin , deleteProduct)
+router.delete("/delete/:id" , verifyToken , isAdmin , deleteProduct);
 
-router.put("/update" , verifyToken , isAdmin , updateProduct)
+router.put(
+  "/update/:id",
+  verifyToken,
+  isAdmin,
+  upload.single("image"), // این خط اضافه شود
+  updateProduct
+);
 export default router;

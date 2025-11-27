@@ -60,7 +60,6 @@ export default component$(() => {
   // منوی navigation
   const navItems = [
     { id: 'dashboard', label: 'داشبورد', icon: '📊' },
-    { id: 'products', label: 'محصولات', icon: '🌿' },
     { id: 'orders', label: 'سفارشات', icon: '📦' },
     { id: 'product-manager', label: 'مدیریت محصولات', icon: '🛍️' }, // اضافه شد
     { id: 'posts', label: 'مدیریت پست‌ها', icon: '📝' },
@@ -85,46 +84,6 @@ export default component$(() => {
 
   const cancelLogout = $(() => {
     showLogoutModal.value = false;
-  });
-
-  // تابع برای دریافت کامپوننت فعال - داخل component$ تعریف شود
-  const getActiveComponent = $(() => {
-    switch (activeTab.value) {
-      case 'dashboard':
-        return $(() => <Dashboard adminName={authData.value.admin.username} />);
-      case 'products':
-        return Products;
-      case 'orders':
-        return Orders;
-      case 'posts':
-        return Posts;
-      case 'CreateAdmin':
-        return $(() => <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />);
-      case 'EditProfile':
-        return $(() => <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />);
-      case 'customers':
-        return Customers;
-      case 'analytics':
-        return $(() => <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>);
-      case 'settings':
-        return $(() => <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>);
-      default:
-        return $(() => (
-          <div class="p-8 text-center">
-            <div class="text-6xl mb-4">⚠️</div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">کامپوننت یافت نشد</h3>
-            <p class="text-gray-600 mb-4">
-              کامپوننت مربوط به "<strong>{activeTab.value}</strong>" وجود ندارد.
-            </p>
-            <button
-              onClick$={() => activeTab.value = 'dashboard'}
-              class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              بازگشت به داشبورد
-            </button>
-          </div>
-        ));
-    }
   });
 
   const getFullImageUrl = (imagePath: string | undefined) => {
@@ -251,7 +210,6 @@ export default component$(() => {
         <main class="flex-1 overflow-auto p-6">
           {/* رندر شرطی کامپوننت‌ها */}
           {activeTab.value === 'dashboard' && <Dashboard adminName={authData.value.admin.username} />}
-          {activeTab.value === 'products' && <Products />}
           {activeTab.value === 'orders' && <Orders />}
           {activeTab.value === 'posts' && <Posts authToken={authData.value.token} />}
           {activeTab.value === 'CreateAdmin' && <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />}
