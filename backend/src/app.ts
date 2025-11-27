@@ -3,10 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { connectDB } from "./config/db";
-
 import authRoutes from "./routes/authRotes";
 import postRoutes from "./routes/postRoutes";
 import productRotes from "./routes/productRotes"
+import smsRoute from "./routes/smsRoute"
 
 dotenv.config();
 const app = express();
@@ -23,6 +23,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 
 app.use("/api/product", productRotes);
+
+app.use('/api/sms', smsRoute);
 
 // connect DB
 connectDB();
