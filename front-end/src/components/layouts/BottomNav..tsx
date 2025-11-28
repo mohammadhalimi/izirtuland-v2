@@ -4,8 +4,6 @@ import { Link, useLocation } from '@builder.io/qwik-city';
 export default component$(() => {
   const location = useLocation();
   
-  // دیباگ مسیر فعلی
-  console.log('📍 مسیر فعلی:', location.url.pathname);
   
   const navItems = [
     {
@@ -40,7 +38,7 @@ export default component$(() => {
       name: 'پروفایل',
       icon: '👤',
       activeIcon: '🤵',
-      href: '/Profile/', // با حروف کوچک
+      href: '/User/', // با حروف کوچک
       badge: null,
       description: 'حساب کاربری'
     }
@@ -48,7 +46,7 @@ export default component$(() => {
 
   const isActive = (href: string) => {
     const currentPath = location.url.pathname;
-    console.log(`🔍 بررسی: ${href} == ${currentPath} -> ${currentPath === href}`);
+    
     
     // برای صفحه اصلی
     if (href === '/' && currentPath === '/') {
@@ -70,7 +68,6 @@ export default component$(() => {
         <div class="flex justify-around items-center">
           {navItems.map((item) => {
             const active = isActive(item.href);
-            console.log(`🎯 ${item.name}: ${item.href} -> ${active}`);
             
             return (
               <Link

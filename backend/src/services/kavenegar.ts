@@ -12,32 +12,33 @@ export type SendSMSResult = {
   details?: any;
 };
 
-export const sendVerifyCode = (phone: string, code: string): Promise<SendSMSResult> => {
-  return new Promise((resolve, reject) => {
-    api.VerifyLookup(
-      {
-        receptor: phone,
-        token: code,
-        template: "porbar",
-      },
-      (response: any, status: number) => {
-        console.log("Kavenegar status:", status);
-        console.log("Kavenegar response:", response);
+export const sendVerifyCode = (phone: string, code: string, template: string) => {
+    return new Promise((resolve, reject) => {
+        api.VerifyLookup(
+            {
+                receptor: phone,
+                token: code,
+                template: template
+            },
+            (response: any, status: number) => {
+                console.log("Kavenegar status:", status);
+                console.log("Kavenegar response:", response);
 
-        if (response?.return?.status === 200) {
-          resolve({ success: true, data: response });
-        } else if (Array.isArray(response) && response.length > 0) {
-          const firstMsg = response[0];
-          if (firstMsg.status === 1 || firstMsg.status === 5) {
-            resolve({ success: true, data: response });
-          } else {
-            reject({ success: false, message: "Failed to send SMS", details: response });
-          }
-        } else {
-          reject({ success: false, message: "Failed to send SMS", details: response || "No response" });
-        }
-      }
-    );
-  });
+                if (response?.return?.status === 200) {
+                    resolve({ success: true, data: response });
+                } else if (Array.isArray(response) && response.length > 0) {
+                    const first = response[0];
+                    if (first.status === 1 || first.status === 5) {
+                        resolve({ success: true, data: response });
+                    } else {
+                        reject({ success: false, details: response });
+                    }
+                } else {
+                    reject({ success: false, details: response || null });
+                }
+            }
+        );
+    });
 };
+
 
