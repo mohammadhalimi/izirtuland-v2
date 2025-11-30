@@ -23,13 +23,13 @@ export default component$(() => {
           
           <div class="flex flex-col sm:flex-row gap-4">
             <Link 
-              href="/products"
+              href="/Products"
               class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover-lift text-center"
             >
               مشاهده محصولات
             </Link>
             <Link 
-              href="/consultation"
+              href="/Contact"
               class="border-2 border-white text-white hover:bg-white hover:text-green-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover-lift text-center"
             >
               مشاوره رایگان

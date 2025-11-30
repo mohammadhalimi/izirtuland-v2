@@ -1,5 +1,6 @@
 // src/components/user/user-profile.tsx
 import { $, component$, useStore, useVisibleTask$ } from "@builder.io/qwik";
+import { API_BASE_URL } from '~/config/api';
 
 interface User {
     _id: string;
@@ -43,8 +44,8 @@ export default component$(() => {
     useVisibleTask$(async () => {
         try {
             const [userRes, ordersRes] = await Promise.all([
-                fetch("http://localhost:5000/api/user/me", { credentials: "include" }),
-                fetch("http://localhost:5000/api/user/me/orders", { credentials: "include" })
+                fetch(`${API_BASE_URL}/api/user/me`, { credentials: "include" }),
+                fetch(`${API_BASE_URL}/api/user/me/orders`, { credentials: "include" })
             ]);
 
             const userData = await userRes.json();
@@ -69,7 +70,7 @@ export default component$(() => {
 
     const logout = $(async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/user/logout", {
+            const res = await fetch(`${API_BASE_URL}/api/user/logout`, {
                 method: "POST",
                 credentials: "include",
             });

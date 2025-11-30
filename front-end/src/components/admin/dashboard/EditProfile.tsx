@@ -1,5 +1,6 @@
 // src/components/admin/dashboard/EditProfile.tsx
 import { component$, useSignal, useTask$, $ } from '@builder.io/qwik';
+import { API_BASE_URL } from '~/config/api';
 
 interface EditProfileProps {
   authToken: string;
@@ -25,7 +26,7 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
   const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:5000${imagePath}`;
+    return `${API_BASE_URL}${imagePath}`;
   };
   
   const previewUrl = useSignal(getFullImageUrl(currentAdmin.profileImage));
@@ -128,7 +129,7 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
       formData.append('profile', selectedFile.value);
       formData.append('adminId', currentAdmin._id);
 
-      const response = await fetch(`http://localhost:5000/api/auth/${currentAdmin._id}/upload-profile`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/${currentAdmin._id}/upload-profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`
@@ -221,7 +222,7 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
         updateData.newPassword = newPassword.value;
       }
 
-      const response = await fetch(`http://localhost:5000/api/auth/update/${currentAdmin._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/update/${currentAdmin._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

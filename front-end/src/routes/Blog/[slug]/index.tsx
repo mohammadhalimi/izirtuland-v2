@@ -3,10 +3,11 @@ import { component$ } from '@builder.io/qwik';
 import { routeLoader$, type DocumentHead } from '@builder.io/qwik-city';
 import type { Post } from '~/components/types/posts';
 import logoC from '../../../media/j529981_photo_2025-01-19_19-18-17.webp'
+import { API_BASE_URL } from '~/config/api';
 
 export const usePost = routeLoader$(async ({ params, status }) => {
     try {
-        const response = await fetch(`http://localhost:5000/api/posts/${params.slug}`);
+        const response = await fetch(`${API_BASE_URL}/api/posts/${params.slug}`);
         if (response.ok) {
             const post: Post = await response.json();
             return post;
@@ -55,7 +56,7 @@ export const head: DocumentHead = ({ resolveValue }) => {
       },
       {
         property: "og:image",
-        content: post.image ? `http://localhost:5000${post.image}` : ''
+        content: post.image ? `${API_BASE_URL}${post.image}` : ''
       },
       {
         property: "og:type",
@@ -88,7 +89,7 @@ export default component$(() => {
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        return `http://localhost:5000${imagePath}`;
+        return `${API_BASE_URL}${imagePath}`;
     };
 
     const formatDate = (dateString: string) => {
@@ -119,7 +120,7 @@ export default component$(() => {
             "name": "پربار باغستان",
             "logo": {
                 "@type": "ImageObject",
-                "url": "http://localhost:3000" + logoC
+                "url": `${API_BASE_URL}` + logoC
             }
         },
         "description": post.metaDescription || post.content.slice(0, 160)
@@ -177,12 +178,6 @@ export default component$(() => {
                         {post.title}
                     </h1>
 
-                    {post.metaDescription && (
-                        <p class="text-xl text-gray-600 mb-6 leading-relaxed max-w-3xl mx-auto">
-                            {post.metaDescription}
-                        </p>
-                    )}
-
                     {/* تگ‌ها */}
                     {post.tags && post.tags.length > 0 && (
                         <div class="flex flex-wrap justify-center gap-2 mb-6">
@@ -197,7 +192,7 @@ export default component$(() => {
                         </div>
                     )}
 
-                    <div class="flex items-center justify-center space-x-6 rtl:space-x-reverse text-gray-500">
+                    <div class="flex items-center justify-center space-x-6 text-gray-500">
                         <div class="flex items-center space-x-2">
                             <img
                                 src={getFullImageUrl(post.author.profileImage)}
@@ -210,7 +205,7 @@ export default component$(() => {
                         </div>
 
                         {post.createdAt && (
-                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <div class="flex items-center space-x-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>

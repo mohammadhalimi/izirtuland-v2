@@ -2,11 +2,12 @@
 import { component$, useResource$, Resource } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
 import type { Product } from '~/components/types/product';
+import { API_BASE_URL } from '~/config/api';
 
 export default component$(() => {
     const productsResource = useResource$<Product[]>(async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/product');
+            const response = await fetch(`${API_BASE_URL}/api/product`);
             if (response.ok) {
                 const products: Product[] = await response.json();
                 return products;
@@ -21,7 +22,7 @@ export default component$(() => {
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        return `http://localhost:5000${imagePath}`;
+        return `${API_BASE_URL}${imagePath}`;
     };
 
     const formatPrice = (price: number) => {

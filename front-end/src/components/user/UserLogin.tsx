@@ -1,6 +1,7 @@
 // src/components/auth/auth-panel.tsx
 import { component$, useStore, $ } from '@builder.io/qwik';
 import { useNavigate } from '@builder.io/qwik-city';
+import { API_BASE_URL } from '~/config/api';
 
 export default component$(() => {
   const nav = useNavigate();
@@ -22,7 +23,7 @@ export default component$(() => {
     authState.error = '';
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/send-otp', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: authState.phone }),
@@ -53,7 +54,7 @@ export default component$(() => {
     authState.error = '';
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -167,7 +168,7 @@ export default component$(() => {
                   inputMode="numeric"
                   pattern="[0-9]*"
                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-center text-2xl font-bold tracking-widest"
-                  placeholder="ـــ ـــ ـــ"
+                  placeholder=" ـــ ـــ ـــ ـــ ـــ ـــ"
                   value={authState.code}
                   onInput$={(e) => {
                     const value = (e.target as HTMLInputElement).value.replace(/\D/g, '');

@@ -9,18 +9,13 @@ export default component$(() => {
         { number: '۳۱', label: 'استان تحت پوشش', icon: '🗺️' }
     ];
 
-    const team = [
-        { name: 'مهندس جمال صوفیان', position: 'مدیر فنی و تحقیق و توسعه', expertise: 'متخصص خاک و تغذیه گیاه', avatar: '👨‍🔬' },
-        { name: 'دکتر جعفر صوفیان', position: 'مدیر تولید', expertise: 'PhD مهندسی شیمی', avatar: '👨‍💼' }
-    ];
-
     const certifications = [
         { name: 'ISO 9001', description: 'سیستم مدیریت کیفیت', icon: '🏆' },
         { name: 'ISO 14001', description: 'سیستم مدیریت محیط زیست', icon: '🌱' },
         { name: 'گواهی سلامت', description: 'سازمان غذا و دارو', icon: '✅' },
         { name: 'استاندارد ملی', description: 'ایران', icon: '🇮🇷' },
-        { name: 'Oxford Certified', description: 'تایید شده توسط دانشگاه آکسفورد', icon: '🎓'},
-        { name: 'California Certified', description: 'تایید شده توسط دانشگاه کالیفرنیا', icon: '🌉'},
+        { name: 'Oxford Certified', description: 'تایید شده توسط دانشگاه آکسفورد', icon: '🎓' },
+        { name: 'California Certified', description: 'تایید شده توسط دانشگاه کالیفرنیا', icon: '🌉' },
     ];
 
     return (
@@ -50,7 +45,7 @@ export default component$(() => {
                             </p>
 
                             <div class="flex flex-col sm:flex-row gap-4">
-                                <a href='/products' class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
+                                <a href='/Products' class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
                                     🛒 مشاهده محصولات
                                 </a>
                                 <a href='/Contact' class="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
@@ -161,25 +156,6 @@ export default component$(() => {
                     </div>
                 </div>
             </section>
-
-            {/* تیم مدیریت */}
-            <section class="py-16 bg-green-50">
-                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">تیم مدیریت و متخصصان</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-                        {team.map((member, index) => (
-                            <div key={index} class="bg-white rounded-2xl p-6 shadow-lg border border-green-100 text-center hover-lift transition-all duration-300">
-                                <div class="text-4xl mb-4">{member.avatar}</div>
-                                <h3 class="font-bold text-gray-800 mb-1">{member.name}</h3>
-                                <p class="text-green-600 text-sm mb-2">{member.position}</p>
-                                <p class="text-gray-600 text-xs">{member.expertise}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             {/* گواهی‌ها و استانداردها */}
             <section class="py-16 bg-white">
                 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -208,10 +184,9 @@ export default component$(() => {
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <button class="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
-                            📞 تماس با کارشناس
-                        </button>
-                        <button class="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover-lift">
-                            📧 ارسال درخواست
+                            <a href='/Contact'>
+                                📞 تماس با کارشناس
+                            </a>
                         </button>
                     </div>
                 </div>

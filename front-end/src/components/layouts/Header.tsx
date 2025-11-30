@@ -36,9 +36,9 @@ export default component$(() => {
                 </svg>
               </button>
               <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100">
-                <Link href="/chemical" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">کودهای شیمیایی</Link>
-                <Link href="/organic" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">کودهای ارگانیک</Link>
-                <Link href="/pesticides" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">سموم کشاورزی</Link>
+                <Link href="/Products" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">کودهای شیمیایی</Link>
+                <Link href="/Products" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">کودهای ارگانیک</Link>
+                <Link href="/Products" class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">سموم کشاورزی</Link>
               </div>
             </div>
             <Link href="/Blog" class="text-gray-700 hover:text-green-600 transition-colors duration-200">وبلاگ</Link>
@@ -48,11 +48,6 @@ export default component$(() => {
 
           {/* آیکون‌های سمت چپ */}
           <div class="flex items-center space-x-4 rtl:space-x-reverse">
-            <button class="p-2 text-gray-600 hover:text-green-600 transition-colors duration-200">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </button>
             <button class="p-2 text-gray-600 hover:text-green-600 transition-colors duration-200">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -121,21 +116,21 @@ export default component$(() => {
               </div>
               <div class="space-y-3 pr-4">
                 <Link 
-                  href="/chemical" 
+                  href="/Products" 
                   class="block py-3 text-gray-600 hover:text-green-600 transition-all duration-200 hover:translate-x-2 hover:font-medium border-b border-gray-100"
                   onClick$={() => isMenuOpen.value = false}
                 >
                   • کودهای شیمیایی
                 </Link>
                 <Link 
-                  href="/organic" 
+                  href="/Products" 
                   class="block py-3 text-gray-600 hover:text-green-600 transition-all duration-200 hover:translate-x-2 hover:font-medium border-b border-gray-100"
                   onClick$={() => isMenuOpen.value = false}
                 >
                   • کودهای ارگانیک
                 </Link>
                 <Link 
-                  href="/pesticides" 
+                  href="/Products" 
                   class="block py-3 text-gray-600 hover:text-green-600 transition-all duration-200 hover:translate-x-2 hover:font-medium border-b border-gray-100"
                   onClick$={() => isMenuOpen.value = false}
                 >
@@ -145,7 +140,7 @@ export default component$(() => {
             </div>
             
             <Link 
-              href="/blog" 
+              href="/Blog" 
               class="block px-4 py-4 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-200 hover:translate-x-2 hover:shadow-sm text-lg font-medium"
               onClick$={() => isMenuOpen.value = false}
             >

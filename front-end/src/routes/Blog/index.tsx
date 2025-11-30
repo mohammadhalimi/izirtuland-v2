@@ -3,11 +3,12 @@ import { component$, useSignal, useTask$ } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
 import type { Post } from '~/components/types/posts';
 import logoC from '../../media/j529981_photo_2025-01-19_19-18-17.webp'
+import { API_BASE_URL } from '~/config/api';
 
 // Loader برای دریافت تمام پست‌ها
 export const usePosts = routeLoader$(async () => {
     try {
-        const response = await fetch('http://localhost:5000/api/posts');
+        const response = await fetch(`${API_BASE_URL}/api/posts`);
         if (response.ok) {
             const posts: Post[] = await response.json();
             return posts;
@@ -44,7 +45,7 @@ export default component$(() => {
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        return `http://localhost:5000${imagePath}`;
+        return `${API_BASE_URL}${imagePath}`;
     };
 
     const formatDate = (dateString: string) => {

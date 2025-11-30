@@ -1,6 +1,7 @@
 // src/components/admin/dashboard/ProductManager.tsx
 import { component$, useSignal, useTask$, useStore, $ } from '@builder.io/qwik';
 import type { Product } from '~/components/types/product';
+import { API_BASE_URL } from '~/config/api';
 
 interface ProductManagerProps {
   authToken: string;
@@ -49,7 +50,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
     loading.value = true;
     error.value = '';
     try {
-      const response = await fetch('http://localhost:5000/api/product');
+      const response = await fetch(`${API_BASE_URL}/api/product`);
       if (response.ok) {
         const data = await response.json();
         products.value = data;
@@ -130,7 +131,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
 
       console.log('📤 ارسال درخواست به سرور...');
 
-      const response = await fetch('http://localhost:5000/api/product/create', {
+      const response = await fetch(`${API_BASE_URL}/api/product/create`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`
@@ -190,7 +191,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
     deleteLoading.value = true;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/product/delete/${productToDelete.value._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/product/delete/${productToDelete.value._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authToken}`
@@ -224,7 +225,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
     const getFullImageUrl = (imagePath: string | undefined) => {
       if (!imagePath) return '';
       if (imagePath.startsWith('http')) return imagePath;
-      return `http://localhost:5000${imagePath}`;
+      return `${API_BASE_URL}${imagePath}`;
     };
 
     productToEdit.value = product;
@@ -273,7 +274,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
 
       console.log('📤 ارسال درخواست آپدیت به سرور...');
 
-      const response = await fetch(`http://localhost:5000/api/product/update/${productToEdit.value._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/product/update/${productToEdit.value._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`
@@ -350,7 +351,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
   const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:5000${imagePath}`;
+    return `${API_BASE_URL}${imagePath}`;
   };
 
   const formatDate = (dateString: string) => {

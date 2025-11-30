@@ -1,8 +1,8 @@
 // src/routes/user/index.tsx
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
-import UserLogin from '~/components/user/userLogin';
-import UserProfile from '~/components/user/userProfile';
-
+import UserLogin from '~/components/user/UserLogin';
+import UserProfile from '~/components/user/UserProfile';
+import { API_BASE_URL } from '~/config/api';
 export default component$(() => {
     const state = useStore({
         isAuthenticated: false,
@@ -12,7 +12,7 @@ export default component$(() => {
     // بررسی وضعیت احراز هویت
     useVisibleTask$(async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/user/me", {
+            const res = await fetch(`${API_BASE_URL}/api/user/me`, {
                 credentials: "include",
             });
             const data = await res.json();

@@ -6,21 +6,21 @@ const categories = [
     id: 1,
     name: 'کودهای شیمیایی',
     icon: '🧪',
-    href: '/products',
+    href: '/Products',
     description: 'NPK، ریز مغذی‌ها و کودهای کامل'
   },
   {
     id: 2,
     name: 'کودهای ارگانیک',
     icon: '🌿',
-    href: '/products',
+    href: '/Products',
     description: 'کمپوست، ورمی کمپوست، کود دامی'
   },
   {
     id: 3,
     name: 'سموم کشاورزی',
     icon: '🐛',
-    href: '/products',
+    href: '/Products',
     description: 'حشره‌کش، قارچ‌کش، علف‌کش',
     color: 'from-red-500 to-red-600'
   }

@@ -1,10 +1,11 @@
 import { component$, useResource$, Resource } from '@builder.io/qwik';
 import type { Post } from '~/components/types/posts';
+import { API_BASE_URL } from '~/config/api';
 
 export default component$(() => {
     const latestPostsResource = useResource$<Post[]>(async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/posts');
+            const response = await fetch(`${API_BASE_URL}/api/posts`);
             if (response.ok) {
                 const posts: Post[] = await response.json();
                 // مرتب سازی بر اساس تاریخ (جدیدترین اول) - با بررسی undefined
@@ -26,7 +27,7 @@ export default component$(() => {
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        return `http://localhost:5000${imagePath}`;
+        return `${API_BASE_URL}${imagePath}`;
     };
 
     const formatDate = (dateString: string | undefined) => {

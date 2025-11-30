@@ -1,5 +1,6 @@
 import { component$, useSignal, useTask$, useStore, $ } from '@builder.io/qwik';
 import type { Post } from '~/components/types/posts';
+import { API_BASE_URL } from '~/config/api';
 
 interface PostsProps {
     authToken: string;
@@ -40,7 +41,7 @@ export default component$<PostsProps>(({ authToken }) => {
     // دریافت پست‌های کاربر جاری از endpoint جدید
     useTask$(async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/posts/my-posts', {
+            const response = await fetch(`${API_BASE_URL}/api/posts/my-posts`, {
                 headers: {
                     'Authorization': `Bearer ${authToken}`
                 }
@@ -103,7 +104,7 @@ export default component$<PostsProps>(({ authToken }) => {
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        return `http://localhost:5000${imagePath}`;
+        return `${API_BASE_URL}${imagePath}`;
     };
 
     // تابع انتخاب فایل
@@ -170,7 +171,7 @@ export default component$<PostsProps>(({ authToken }) => {
 
             console.log('📤 ارسال FormData به /api/posts/create...');
 
-            const response = await fetch('http://localhost:5000/api/posts/create', {
+            const response = await fetch(`${API_BASE_URL}/api/posts/create`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -220,7 +221,7 @@ export default component$<PostsProps>(({ authToken }) => {
         isActionLoading.value = true;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/posts/delete/${postId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/posts/delete/${postId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authToken}`

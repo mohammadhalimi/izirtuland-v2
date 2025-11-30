@@ -4,13 +4,13 @@ import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
 
 // ایمپورت کامپوننت‌ها
 import Dashboard from '~/components/admin/dashboard/Dashboard';
-import Products from '~/components/admin/dashboard/Products';
 import Orders from '~/components/admin/dashboard/Orders';
 import Customers from '~/components/admin/dashboard/Customers';
 import CreateAdmin from '~/components/admin/dashboard/CreateAdmin';
 import EditProfile from '~/components/admin/dashboard/EditProfile';
 import Posts from '~/components/admin/dashboard/Posts';
 import ProductManager from '~/components/admin/dashboard/ProductManager';
+import { API_BASE_URL } from '~/config/api';
 
 // Type برای اطلاعات ادمین
 interface AdminData {
@@ -89,7 +89,7 @@ export default component$(() => {
   const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:5000${imagePath}`;
+    return `${API_BASE_URL}${imagePath}`;
   };
 
   return (

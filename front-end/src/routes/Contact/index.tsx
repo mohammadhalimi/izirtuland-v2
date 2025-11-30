@@ -217,26 +217,6 @@ export default component$(() => {
                     </div>
                 </div>
             </section>
-
-            {/* CTA پایانی */}
-            <section class="py-16 bg-linear-to-r from-green-600 to-green-700">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl lg:text-4xl font-bold text-white mb-6">
-                        سوالی دارید؟
-                    </h2>
-                    <p class="text-green-100 text-lg mb-8">
-                        همین حالا با ما تماس بگیرید. کارشناسان ما آماده پاسخگویی به شما هستند.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button class="bg-white text-green-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover-lift">
-                            📞 تماس فوری
-                        </button>
-                        <button class="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover-lift">
-                            💬 گفتگوی آنلاین
-                        </button>
-                    </div>
-                </div>
-            </section>
         </div>
     );
 });

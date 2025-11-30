@@ -1,5 +1,6 @@
 // src/components/admin/dashboard/CreateAdmin.tsx
 import { component$, useSignal, useTask$, $ } from '@builder.io/qwik';
+import { API_BASE_URL } from '~/config/api';
 
 interface CreateAdminProps {
   authToken: string;
@@ -39,7 +40,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
   const fetchAdmins = $(async () => {
     try {
       loadingAdmins.value = true;
-      const response = await fetch('http://localhost:5000/api/auth/getAlladmin', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/getAlladmin`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -94,7 +95,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
     message.value = '';
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +164,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
     deletingAdminId.value = adminId;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/deleteAdmin/${adminId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/deleteAdmin/${adminId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -212,7 +213,7 @@ export default component$<CreateAdminProps>(({ authToken, currentAdmin }) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
     // اگر مسیر نسبی است، آدرس کامل بسازید
-    return `http://localhost:5000${imagePath}`;
+    return `${API_BASE_URL}${imagePath}`;
   };
   return (
     <div class="space-y-6">
