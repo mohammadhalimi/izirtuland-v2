@@ -214,7 +214,7 @@ export default component$(() => {
           {activeTab.value === 'posts' && <Posts authToken={authData.value.token} />}
           {activeTab.value === 'CreateAdmin' && <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />}
           {activeTab.value === 'EditProfile' && <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />}
-          {activeTab.value === 'customers' && <Customers />}
+          {activeTab.value === 'customers' && <Customers authToken={authData.value.token}/>}
           {activeTab.value === 'analytics' && <div class="p-8 text-center">📈 کامپوننت تحلیل‌ها به زودی...</div>}
           {activeTab.value === 'settings' && <div class="p-8 text-center">⚙️ کامپوننت تنظیمات به زودی...</div>}
           {activeTab.value === 'product-manager' && <ProductManager authToken={authData.value.token} />}

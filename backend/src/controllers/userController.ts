@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../models/User";
 import { AuthRequest } from "../middlewares/authUser";
 import { Order } from "../models/Order";
+import { assert } from "console";
 
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -79,3 +80,12 @@ export const logout = (req: Request, res: Response) => {
 
   return res.json({ success: true, message: "Logged out" });
 };
+
+export const getAllUsers = async (req: Request ,  res: Response) => {
+  try{
+    const user = await User.find();
+     res.status(200).json(user);
+  } catch(error){
+     res.status(500).json({ message: (error as Error).message });
+  }
+}
