@@ -147,14 +147,14 @@ export default component$(() => {
               📝 وبلاگ
             </Link>
             <Link 
-              href="/about" 
+              href="/About" 
               class="block px-4 py-4 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-200 hover:translate-x-2 hover:shadow-sm text-lg font-medium"
               onClick$={() => isMenuOpen.value = false}
             >
               ℹ️ درباره ما
             </Link>
             <Link 
-              href="/contact" 
+              href="/Contact" 
               class="block px-4 py-4 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-200 hover:translate-x-2 hover:shadow-sm text-lg font-medium"
               onClick$={() => isMenuOpen.value = false}
             >

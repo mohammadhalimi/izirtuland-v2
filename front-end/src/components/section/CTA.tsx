@@ -65,7 +65,7 @@ export default component$(() => {
         {/* CTA Buttons */}
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Link
-            href="/consultation"
+            href="/Contact"
             class="group relative bg-white text-green-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl hover-lift min-w-[200px]"
           >
             <div class="flex items-center justify-center space-x-2 rtl:space-x-reverse">
@@ -76,7 +76,7 @@ export default component$(() => {
           </Link>
 
           <Link
-            href="/products"
+            href="/Products"
             class="group relative border-2 border-white text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:bg-white hover:text-green-700 hover:shadow-2xl hover-lift min-w-[200px]"
           >
             <div class="flex items-center justify-center space-x-2 rtl:space-x-reverse">
@@ -112,7 +112,7 @@ export default component$(() => {
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
               <span>📞</span>
               <span class="font-semibold">تلفن:</span>
-              <span>021-33370954</span>
+              <span>02133370954</span>
             </div>
             <div class="w-px h-6 bg-white bg-opacity-30"></div>
             <div class="flex items-center space-x-2 rtl:space-x-reverse">

@@ -29,8 +29,13 @@ export default component$(() => {
         return price.toLocaleString('fa-IR') + ' تومان';
     };
 
-    const getBrandColor = (brand: string) => {
-        return brand === 'Izirtu Land' ? 'blue' : 'orange';
+    const getBrandColor = (brand: string): string => {
+        if (brand === 'Izirtu Land') {
+            return 'blue';
+        } else if (brand === 'Khak Shimi') {
+            return 'orange';
+        }
+        return 'gray'; // حالت پیش‌فرض
     };
 
     const getModelColor = (model: string) => {
@@ -55,7 +60,7 @@ export default component$(() => {
                 <div class="container mx-auto px-6 py-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                            <Link 
+                            <Link
                                 href="/"
                                 class="text-2xl font-bold text-gray-900 hover:text-green-600 transition-colors duration-200"
                             >
@@ -68,11 +73,6 @@ export default component$(() => {
                                 <Link href="/Blog" class="hover:text-gray-900 transition-colors">بلاگ</Link>
                                 <Link href="/About" class="hover:text-gray-900 transition-colors">درباره ما</Link>
                             </nav>
-                        </div>
-                        <div class="flex items-center">
-                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
-                                تماس با ما
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -172,12 +172,13 @@ export default component$(() => {
                             ) : (
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                                     {products.map((product) => (
-                                        <div
+                                        <a
                                             key={product._id}
-                                            class="group bg-white rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                            href={`/Products/${product._id}`}
+                                            class="group bg-white rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 overflow-hidden block"
                                         >
                                             {/* تصویر محصول */}
-                                            <div class="aspect-w-16 aspect-h-12 bg-gray-100 overflow-hidden">
+                                            <div class="relative aspect-w-16 aspect-h-12 bg-gray-100 overflow-hidden">
                                                 {product.image ? (
                                                     <img
                                                         src={getFullImageUrl(product.image)}
@@ -191,13 +192,12 @@ export default component$(() => {
                                                         </svg>
                                                     </div>
                                                 )}
-                                                
+
                                                 {/* برچسب برند */}
-                                                <div class={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    getBrandColor(product.brand) === 'blue' 
-                                                        ? 'bg-blue-500 text-white' 
+                                                <div class={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${getBrandColor(product.brand) === 'blue'
+                                                        ? 'bg-blue-500 text-white'
                                                         : 'bg-orange-500 text-white'
-                                                }`}>
+                                                    }`}>
                                                     {product.brand}
                                                 </div>
                                             </div>
@@ -214,11 +214,10 @@ export default component$(() => {
 
                                                 {/* اطلاعات محصول */}
                                                 <div class="flex items-center justify-between mb-4">
-                                                    <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                                        getModelColor(product.model) === 'green'
+                                                    <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getModelColor(product.model) === 'green'
                                                             ? 'bg-green-100 text-green-800'
                                                             : 'bg-purple-100 text-purple-800'
-                                                    }`}>
+                                                        }`}>
                                                         {product.model}
                                                     </span>
                                                     <span class="text-sm text-gray-500 font-medium">
@@ -231,13 +230,12 @@ export default component$(() => {
                                                     <div class="text-lg font-bold text-gray-900">
                                                         {formatPrice(product.price)}
                                                     </div>
-                                                    
-                                                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors duration-200">
-                                                        افزودن به سبد خرید
-                                                    </button>
+                                                    <div class="text-green-600 text-sm font-medium group-hover:text-green-700">
+                                                        مشاهده جزئیات →
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </a>
                                     ))}
                                 </div>
                             )}

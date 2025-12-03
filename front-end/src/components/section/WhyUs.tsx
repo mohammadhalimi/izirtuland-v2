@@ -103,16 +103,6 @@ export default component$(() => {
                   </li>
                 ))}
               </ul>
-
-              {/* دکمه بیشتر */}
-              <div class="mt-6 pt-4 border-t border-gray-100">
-                <button class="w-full bg-green-50 hover:bg-green-100 text-green-600 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 rtl:space-x-reverse group/btn">
-                  <span>اطلاعات بیشتر</span>
-                  <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
             </div>
           ))}
         </div>

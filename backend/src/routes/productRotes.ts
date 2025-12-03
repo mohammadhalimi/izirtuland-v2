@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken, isAdmin } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/upload";
-import { createProduct , getProduct , deleteProduct , updateProduct } from "../controllers/producController";
+import { createProduct , getProduct , deleteProduct , updateProduct, getProductById } from "../controllers/producController";
 
 const router = express.Router();
 
@@ -14,6 +14,8 @@ router.post(
 );
 
 router.get("/" , getProduct);
+
+router.get("/:id" , getProductById)
 
 router.delete("/delete/:id" , verifyToken , isAdmin , deleteProduct);
 
