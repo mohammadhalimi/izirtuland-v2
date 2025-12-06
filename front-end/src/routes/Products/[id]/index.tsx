@@ -1,12 +1,10 @@
 // src/routes/products/[id]/index.tsx
-import { component$, Resource } from '@builder.io/qwik';
+import { $, component$, Resource, useContext } from '@builder.io/qwik';
 import { useLocation, Link, routeLoader$ } from '@builder.io/qwik-city';
 import type { Product } from '~/components/types/product';
 import { API_BASE_URL } from '~/config/api';
+import { CartContext } from '~/context/cart-context';
 
-// **********************************************
-// * ROUTE LOADER (بخش دریافت داده بدون تغییر) *
-// **********************************************
 export const useProduct = routeLoader$(async (requestEvent) => {
     const { params, status } = requestEvent;
 
@@ -16,13 +14,28 @@ export const useProduct = routeLoader$(async (requestEvent) => {
         return null;
     }
 
-
     const apiUrl = `${API_BASE_URL}/api/product/${params.id}`;
     try {
         const response = await fetch(apiUrl);
         if (response.ok) {
             const data = await response.json();
-            return data;
+            console.log('API Response:', data);
+
+            // تبدیل داده API به Product type
+            const product: Product = {
+                _id: data._id || data.id || '',
+                id: data.id || data._id || '',
+                name: data.name || '',
+                content: data.content || '',
+                image: data.image || '',
+                createdAt: data.createdAt || new Date().toISOString(),
+                brand: data.brand || '',
+                price: Number(data.price) || 0,
+                model: data.model || '',
+                packageSize: data.packageSize || ''
+            };
+
+            return product;
         } else {
             const errorText = await response.text();
             console.log('Response error:', errorText);
@@ -37,9 +50,33 @@ export const useProduct = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-    const location = useLocation();
+        const location = useLocation();
     const productId = location.params.id;
     const productResource = useProduct();
+
+    const cart = useContext(CartContext);
+
+    const addToCart = $(async (product: Product) => {
+        if (!cart.addItem) {
+            console.error('Cart functions not initialized yet');
+            alert('سیستم سبد خرید آماده نیست. لطفاً چند لحظه صبر کنید.');
+            return;
+        }
+
+        await cart.addItem({
+            id: product._id,
+            name: product.name,
+            price: product.price,
+            quantity: 1,
+            packageSize: product.packageSize,
+            brand: product.brand,
+            model: product.model,
+            image: product.image
+        });
+
+        alert("محصول به سبد خرید اضافه شد!");
+    });
+
 
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
@@ -48,7 +85,6 @@ export default component$(() => {
     };
 
     const formatPrice = (price: number) => {
-        // تغییرات: استفاده از جداکننده هزارگان استاندارد و اطمینان از نمایش فارسی
         return price.toLocaleString('fa-IR') + ' تومان';
     };
 
@@ -63,18 +99,23 @@ export default component$(() => {
         return sizeMap[packageSize] || packageSize;
     };
 
-    return (
-        // تم پس‌زمینه: از خاکستری روشن به سفید، برای ظاهری ملایم‌تر و لوکس‌تر
-        <div class="min-h-screen bg-linear-to-br from-gray-50 to-white">
+    const formatDate = (dateString: string) => {
+        try {
+            return new Date(dateString).toLocaleDateString('fa-IR');
+        } catch {
+            return dateString;
+        }
+    };
 
-            {/* 🍎 هدر بهبود یافته */}
+    return (
+        <div class="min-h-screen bg-linear-to-br from-gray-50 to-white">
+            {/* هدر */}
             <header class="sticky top-0 z-10 bg-white shadow-md">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-6 rtl:space-x-reverse">
                             <Link
                                 href="/"
-                                // تغییر رنگ: سبز عمیق‌تر و ضخامت فونت بیشتر
                                 class="text-3xl font-extrabold text-green-700 hover:text-green-800 transition-colors duration-200"
                             >
                                 پربارباغستان
@@ -86,6 +127,17 @@ export default component$(() => {
                                 <span class="text-green-600 font-semibold border-b-2 border-green-600 pb-1">جزئیات محصول</span>
                             </nav>
                         </div>
+                        {/* نمایش تعداد محصولات در سبد */}
+                        <Link href="/Card" class="relative">
+                            <div class="w-10 h-10 rounded-full border border-emerald-200 flex items-center justify-center text-emerald-700 bg-emerald-50">
+                                🛒
+                            </div>
+                            {cart.items.length > 0 && (
+                                <div class="absolute -top-1 -right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)}
+                                </div>
+                            )}
+                        </Link>
                     </div>
                 </div>
             </header>
@@ -95,13 +147,11 @@ export default component$(() => {
                     value={productResource}
                     onPending={() => (
                         <div class="flex flex-col justify-center items-center py-40">
-                            {/* Loader جذاب‌تر */}
                             <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
                             <p class="mt-6 text-xl text-gray-600">در حال بارگذاری محصول...</p>
                         </div>
                     )}
                     onRejected={(error) => (
-                        // بخش خطا: بهبود بصری آیکون و دکمه
                         <div class="text-center py-20 bg-white rounded-xl shadow-lg p-10">
                             <div class="text-red-500 mb-6">
                                 <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,9 +168,8 @@ export default component$(() => {
                             </Link>
                         </div>
                     )}
-                    onResolved={(product) => {
+                    onResolved={(product: Product | null) => {
                         if (!product) {
-                            // محصول یافت نشد: بهبود بصری آیکون و دکمه
                             return (
                                 <div class="text-center py-20 bg-white rounded-xl shadow-lg p-10">
                                     <div class="text-gray-400 mb-6">
@@ -140,21 +189,17 @@ export default component$(() => {
                             );
                         }
 
-                        // **********************************************
-                        // * نمایش محصول (بخش اصلی بهبود UI) *
-                        // **********************************************
                         return (
                             <div class="max-w-6xl mx-auto">
                                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
-                                    {/* 🖼️ تصویر محصول (ستون چپ - اشغال 3 واحد) */}
+                                    {/* تصویر محصول */}
                                     <div class="lg:col-span-3 bg-white rounded-3xl border border-gray-100 p-8 shadow-2xl shadow-gray-200/50 transition-transform hover:shadow-2xl hover:shadow-gray-300/60 duration-300">
                                         <div class="aspect-video bg-gray-100 rounded-2xl overflow-hidden">
                                             {product.image ? (
                                                 <img
                                                     src={getFullImageUrl(product.image)}
-                                                    alt={product.name || 'محصول'}
-                                                    // ارتفاع پویا و فیت شدن
+                                                    alt={product.name}
                                                     class="w-full h-full object-contain"
                                                     onError$={(e) => {
                                                         (e.target as HTMLImageElement).style.display = 'none';
@@ -177,12 +222,11 @@ export default component$(() => {
                                         </div>
                                     </div>
 
-                                    {/* 📋 اطلاعات محصول (ستون راست - اشغال 2 واحد) */}
+                                    {/* اطلاعات محصول */}
                                     <div class="lg:col-span-2 space-y-8">
 
                                         {/* نام و برچسب‌ها */}
                                         <div class="space-y-4">
-                                            {/* برچسب‌ها با رنگ بندی مرتبط‌تر */}
                                             <div class="flex items-center space-x-3">
                                                 <span class={`px-4 py-1 rounded-full text-sm font-semibold shadow-sm ${product.brand === 'Izirtu Land'
                                                     ? 'bg-blue-600 text-white'
@@ -198,16 +242,14 @@ export default component$(() => {
                                                 </span>
                                             </div>
 
-                                            {/* نام محصول: بزرگتر و پررنگ‌تر */}
                                             <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">
-                                                {product.name || 'نام محصول ناشناخته'}
+                                                {product.name}
                                             </h1>
                                         </div>
 
                                         {/* قیمت و دکمه خرید */}
                                         <div class="space-y-6">
                                             <div class="flex items-end justify-between border-b border-gray-200 pb-4">
-                                                {/* قیمت با فونت بزرگ و سبز رنگ */}
                                                 <div class="flex items-baseline space-x-2">
                                                     <span class="text-4xl font-bold text-green-700">
                                                         {product.price ? formatPrice(product.price) : 'قیمت نامشخص'}
@@ -220,12 +262,13 @@ export default component$(() => {
                                                 </div>
                                             </div>
 
-                                            {/* دکمه خرید برجسته و پهن */}
-                                            <button class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-700 transition-colors duration-200 shadow-lg shadow-green-500/50 hover:shadow-xl hover:shadow-green-600/50">
+                                            <button
+                                                onClick$={() => addToCart(product)}
+                                                class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-700 transition-colors duration-200 shadow-lg shadow-green-500/50 hover:shadow-xl hover:shadow-green-600/50"
+                                            >
                                                 🛒 افزودن به سبد خرید
                                             </button>
                                         </div>
-
 
                                         {/* توضیحات */}
                                         {product.content && (
@@ -239,21 +282,37 @@ export default component$(() => {
 
                                         {/* مشخصات فنی */}
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {[
-                                                { label: 'برند', value: product.brand, icon: '🏷️' },
-                                                { label: 'نوع', value: product.model, icon: '📦' },
-                                                { label: 'سایز بسته', value: formatPackageSize(product.packageSize), icon: '⚖️' }
-                                            ].map((spec, index) => (
-                                                spec.value && (
-                                                    <div key={index} class="flex items-center p-4 bg-linear-to-br from-gray-50 to-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors">
-                                                        <span class="text-2xl mr-3">{spec.icon}</span>
-                                                        <div class="flex-1">
-                                                            <div class="text-sm text-gray-500">{spec.label}</div>
-                                                            <div class="font-semibold text-gray-900">{spec.value}</div>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            ))}
+                                            <div class="flex items-center p-4 bg-linear-to-br from-gray-50 to-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors">
+                                                <span class="text-2xl mr-3">🏷️</span>
+                                                <div class="flex-1">
+                                                    <div class="text-sm text-gray-500">برند</div>
+                                                    <div class="font-semibold text-gray-900">{product.brand || 'نامشخص'}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center p-4 bg-linear-to-br from-gray-50 to-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors">
+                                                <span class="text-2xl mr-3">📦</span>
+                                                <div class="flex-1">
+                                                    <div class="text-sm text-gray-500">نوع محصول</div>
+                                                    <div class="font-semibold text-gray-900">{product.model || 'نامشخص'}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center p-4 bg-linear-to-br from-gray-50 to-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors">
+                                                <span class="text-2xl mr-3">⚖️</span>
+                                                <div class="flex-1">
+                                                    <div class="text-sm text-gray-500">سایز بسته</div>
+                                                    <div class="font-semibold text-gray-900">{formatPackageSize(product.packageSize) || 'نامشخص'}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center p-4 bg-linear-to-br from-gray-50 to-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors">
+                                                <span class="text-2xl mr-3">📅</span>
+                                                <div class="flex-1">
+                                                    <div class="text-sm text-gray-500">تاریخ ایجاد</div>
+                                                    <div class="font-semibold text-gray-900">{formatDate(product.createdAt)}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
