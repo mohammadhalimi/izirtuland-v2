@@ -376,7 +376,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
         <h2 class="text-2xl font-bold text-gray-800">مدیریت محصولات</h2>
         <button
           onClick$={() => showCreateForm.value = true}
-          class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2 rtl:space-x-reverse"
+          class="bg-green-600 cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2 rtl:space-x-reverse"
         >
           <span>➕</span>
           <span>محصول جدید</span>
@@ -441,6 +441,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
                 placeholder="قیمت"
                 min="1"
               />
+              <p class="px-2 pt-2 text-red-700">{formData.price.toLocaleString()}</p>
             </div>
 
             {/* برند */}
@@ -544,13 +545,13 @@ export default component$<ProductManagerProps>(({ authToken }) => {
             </div>
           </div>
 
-          <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+          <div class="flex justify-end space-x-3">
             <button
               onClick$={() => {
                 showCreateForm.value = false;
                 resetForm();
               }}
-              class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200 border border-gray-300"
+              class="px-4 py-2 cursor-pointer text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200 border border-gray-300"
             >
               انصراف
             </button>
@@ -558,7 +559,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
             <button
               onClick$={createProduct}
               disabled={formLoading.value || !formData.name.trim() || !formData.content.trim() || formData.price <= 0}
-              class={`px-6 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2 rtl:space-x-reverse ${formLoading.value || !formData.name.trim() || !formData.content.trim() || formData.price <= 0
+              class={`px-6 py-2 cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2 rtl:space-x-reverse ${formLoading.value || !formData.name.trim() || !formData.content.trim() || formData.price <= 0
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-green-600 text-white hover:bg-green-700'
                 }`}
@@ -609,7 +610,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
                 {products.value.map((product) => (
                   <tr key={product._id} class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                      <div class="flex items-center space-x-3">
                         {product.image && (
                           <img
                             src={getFullImageUrl(product.image)}
@@ -881,7 +882,6 @@ export default component$<ProductManagerProps>(({ authToken }) => {
             class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
             onClick$={closeDeleteModal}
           />
-
           {/* Modal */}
           <div class="flex min-h-full items-center justify-center p-4">
             <div class="relative bg-white rounded-2xl max-w-md w-full mx-auto transform transition-all">
@@ -937,7 +937,6 @@ export default component$<ProductManagerProps>(({ authToken }) => {
           </div>
         </div>
       )}
-
     </div>
   );
 });

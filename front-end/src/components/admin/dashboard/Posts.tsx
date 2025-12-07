@@ -340,30 +340,6 @@ export default component$<PostsProps>(({ authToken }) => {
                     <h3 class="text-2xl font-bold text-gray-800 mb-1">{posts.value.length}</h3>
                     <p class="text-green-600 font-medium">پست‌های من</p>
                 </div>
-
-                <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6 text-center">
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3">
-                        👁️
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-1">۰</h3>
-                    <p class="text-blue-600 font-medium">بازدید امروز</p>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6 text-center">
-                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mx-auto mb-3">
-                        ❤️
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-1">۰</h3>
-                    <p class="text-purple-600 font-medium">لایک‌ها</p>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6 text-center">
-                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 mx-auto mb-3">
-                        💬
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-1">۰</h3>
-                    <p class="text-orange-600 font-medium">نظرات</p>
-                </div>
             </div>
 
             {/* پیام */}
