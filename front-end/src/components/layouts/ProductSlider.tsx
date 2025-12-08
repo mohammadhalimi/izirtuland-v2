@@ -51,7 +51,7 @@ export default component$<ProductSliderProps>(({
 
   // رفتن به صفحه محصول
   const goToProduct = $((productId: string) => {
-    window.location.href = `/products/${productId}`;
+    window.location.href = `/Products/${productId}`;
   });
 
   // مقداردهی اولیه Swiper
@@ -153,11 +153,6 @@ export default component$<ProductSliderProps>(({
         <h2 class="text-2xl md:text-3xl font-bold text-gray-900 border-r-4 border-green-600 pr-4">
           {title}
         </h2>
-        
-        <div class="text-sm text-gray-500 flex items-center gap-2">
-          <span class="hidden sm:inline">برای تغییر محصول، دکمه‌ها را بزنید یا با انگشت بکشید</span>
-          <span class="sm:hidden">با انگشت بکشید</span>
-        </div>
       </div>
 
       {/* Swiper Container */}
@@ -204,7 +199,7 @@ export default component$<ProductSliderProps>(({
                                 e.stopPropagation();
                                 onAddToCart(product);
                               }}
-                              class="absolute bottom-4 left-4 bg-linear-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:from-green-600 hover:to-emerald-700 transform translate-y-4 group-hover:translate-y-0 shadow-lg flex items-center gap-2 z-20"
+                              class="absolute bottom-4 left-4 bg-linear-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:from-green-600 hover:to-emerald-700 transform translate-y-4 group-hover:translate-y-0 shadow-lg flex items-center gap-2 z-20 cursor-pointer"
                             >
                               <span class="text-lg">🛒</span>
                               <span class="text-sm font-medium whitespace-nowrap">افزودن</span>
@@ -251,7 +246,7 @@ export default component$<ProductSliderProps>(({
                                   e.stopPropagation();
                                   goToProduct(product._id);
                                 }}
-                                class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center gap-2 group"
+                                class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center gap-2 group cursor-pointer"
                               >
                                 <span class="whitespace-nowrap">جزئیات</span>
                                 <span class="text-lg transition-transform duration-300 group-hover:translate-x-1">→</span>

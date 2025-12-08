@@ -184,7 +184,7 @@ export default component$(() => {
                             <h3 class="text-2xl font-bold text-gray-900 mb-3">خطا در دریافت محصول</h3>
                             <p class="text-gray-600 mb-8">{error?.message || 'مشکلی پیش آمده، لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.'}</p>
                             <Link
-                                href="/products"
+                                href="/Products"
                                 class="inline-block bg-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors shadow-md"
                             >
                                 مشاهده همه محصولات
@@ -203,7 +203,7 @@ export default component$(() => {
                                     <h3 class="text-2xl font-bold text-gray-900 mb-3">محصول یافت نشد</h3>
                                     <p class="text-gray-600 mb-8">محصول مورد نظر با شناسه **{productId}** وجود ندارد یا حذف شده است.</p>
                                     <Link
-                                        href="/products"
+                                        href="/Products"
                                         class="inline-block bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-md"
                                     >
                                         مشاهده همه محصولات
@@ -211,7 +211,6 @@ export default component$(() => {
                                 </div>
                             );
                         }
-
                         return (
                             <>
                                 <div class="max-w-6xl mx-auto">
@@ -286,7 +285,7 @@ export default component$(() => {
 
                                                 <button
                                                     onClick$={() => addToCart(product)}
-                                                    class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-700 transition-colors duration-200 shadow-lg shadow-green-500/50 hover:shadow-xl hover:shadow-green-600/50"
+                                                    class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-700 transition-colors duration-200 shadow-lg shadow-green-500/50 hover:shadow-xl hover:shadow-green-600/50 cursor-pointer"
                                                 >
                                                     🛒 افزودن به سبد خرید
                                                 </button>
@@ -349,7 +348,7 @@ export default component$(() => {
                                                         <div class="text-6xl mb-4">📦</div>
                                                         <p class="text-gray-600">در حال حاضر محصول مرتبطی وجود ندارد</p>
                                                         <Link
-                                                            href="/products"
+                                                            href="/Products"
                                                             class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
                                                         >
                                                             مشاهده همه محصولات

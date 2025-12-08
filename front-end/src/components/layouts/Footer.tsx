@@ -1,7 +1,8 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useContext } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
 
 export default component$(() => {
+
   return (
     <footer class="bg-linear-to-b from-gray-900 to-gray-800 text-white">
       {/* Main Footer */}

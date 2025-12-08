@@ -1,10 +1,12 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useContext } from '@builder.io/qwik';
 import { Link, useLocation } from '@builder.io/qwik-city';
+import { CartContext } from '~/context/cart-context';
 
 export default component$(() => {
   const location = useLocation();
-  
-  
+  const cart = useContext(CartContext);
+
+
   const navItems = [
     {
       id: 1,
@@ -20,7 +22,7 @@ export default component$(() => {
       name: 'سبد خرید',
       icon: '🛒',
       activeIcon: '🛍️',
-      href: '/Cart/',
+      href: '/Card/',
       badge: 3,
       description: 'مشاهده سبد'
     },
@@ -46,18 +48,18 @@ export default component$(() => {
 
   const isActive = (href: string) => {
     const currentPath = location.url.pathname;
-    
-    
+
+
     // برای صفحه اصلی
     if (href === '/' && currentPath === '/') {
       return true;
     }
-    
+
     // برای صفحات دیگر
     if (href !== '/' && currentPath.startsWith(href)) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -68,7 +70,7 @@ export default component$(() => {
         <div class="flex justify-around items-center">
           {navItems.map((item) => {
             const active = isActive(item.href);
-            
+
             return (
               <Link
                 key={item.id}
@@ -76,8 +78,8 @@ export default component$(() => {
                 class={`
                   relative flex flex-col items-center justify-center py-3 px-1 
                   transition-all duration-300 flex-1 min-w-0 group
-                  ${active 
-                    ? 'text-green-600 transform -translate-y-1' 
+                  ${active
+                    ? 'text-green-600 transform -translate-y-1'
                     : 'text-gray-500 hover:text-green-500'
                   }
                 `}
@@ -90,27 +92,22 @@ export default component$(() => {
                   `}>
                     {active ? item.activeIcon : item.icon}
                   </span>
-                  
+
                   {/* بدج */}
-                  {item.badge && (
-                    <span class={`
-                      absolute -top-2 -right-2 text-xs rounded-full px-1 min-w-5 h-5 
-                      flex items-center justify-center font-bold
-                      ${typeof item.badge === 'number' 
-                        ? 'bg-red-500 text-white' 
-                        : 'bg-green-500 text-white text-[10px]'
-                      }
-                    `}>
-                      {item.badge}
-                    </span>
-                  )}
+                  {
+                    item.id == 2 && (
+                      <div class="absolute -top-1 -right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                        {cart.items.reduce((sum, item) => sum + item.quantity, 0)}
+                      </div>
+                    )
+                  }
                 </div>
 
                 {/* متن */}
                 <span class={`
                   text-xs transition-all duration-300 whitespace-nowrap
-                  ${active 
-                    ? 'font-bold scale-105' 
+                  ${active
+                    ? 'font-bold scale-105'
                     : 'font-medium scale-100 opacity-90'
                   }
                 `}>
@@ -118,9 +115,11 @@ export default component$(() => {
                 </span>
 
                 {/* نشانگر فعال */}
-                {active && (
-                  <div class="absolute top-0 w-10 h-1 bg-linear-to-r from-green-400 to-green-600 rounded-b-full"></div>
-                )}
+                {
+                  active && (
+                    <div class="absolute top-0 w-10 h-1 bg-linear-to-r from-green-400 to-green-600 rounded-b-full"></div>
+                  )
+                }
 
                 {/* Tooltip */}
                 <div class="absolute -top-12 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
@@ -136,10 +135,10 @@ export default component$(() => {
 
         {/* افکت شیشه‌ای */}
         <div class="absolute -top-6 left-0 right-0 h-6 bg-linear-to-t from-white/80 to-transparent pointer-events-none"></div>
-      </div>
+      </div >
 
       {/* فضای خالی در پایین صفحه */}
-      <div class="lg:hidden h-20"></div>
+      < div class="lg:hidden h-20" ></div >
     </>
   );
 });
