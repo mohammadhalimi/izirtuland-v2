@@ -43,7 +43,7 @@ export const Notification = component$<{
         </div>
         <button
           onClick$={props.onClose}
-          class="p-1 hover:bg-white/30 rounded-lg transition-colors"
+          class="p-1 hover:bg-white/30 rounded-lg transition-colors cursor-pointer"
         >
           <XIcon />
         </button>

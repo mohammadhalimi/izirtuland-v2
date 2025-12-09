@@ -1,7 +1,7 @@
 // src/routes/products/index.tsx
 import { component$, useResource$, Resource, useSignal, useComputed$ } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
 import type { Product } from '~/components/types/product';
+import { UpText } from '~/components/ui/products/UpText';
 import { API_BASE_URL } from '~/config/api';
 
 const normalizeText = (text: string) => {
@@ -31,6 +31,7 @@ export default component$(() => {
             return [];
         }
     });
+    
     const getFullImageUrl = (imagePath: string | undefined) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
@@ -64,58 +65,22 @@ export default component$(() => {
 
     return (
         <div class="min-h-screen bg-white">
-            {/* هدر مینیمال */}
-            <header class="border-b border-gray-100">
-                <div class="container mx-auto px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                            <Link
-                                href="/"
-                                class="text-2xl font-bold text-gray-900 hover:text-green-600 transition-colors duration-200"
-                            >
-                                پربارباغستان
-                            </Link>
-                            <div class="h-6 w-px bg-gray-200"></div>
-                            <nav class="flex items-center space-x-6 text-sm text-gray-600 px-2">
-                                <Link href="/" class="hover:text-gray-900 transition-colors">خانه</Link>
-                                <span class="text-green-600 font-medium">محصولات</span>
-                                <Link href="/Blog" class="hover:text-gray-900 transition-colors">بلاگ</Link>
-                                <Link href="/About" class="hover:text-gray-900 transition-colors">درباره ما</Link>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* هیرو سکشن */}
-            <section class="bg-linear-to-br from-gray-50 to-white py-16">
-                <div class="container mx-auto px-6">
-                    <div class="text-center max-w-3xl mx-auto">
-                        <h1 class="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                            محصولات <span class="text-green-600">کشاورزی</span>
-                        </h1>
-                        <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                            با کیفیت‌ترین محصولات کود و سموم کشاورزی با استانداردهای بین‌المللی
-                        </p>
-                    </div>
-                </div>
-            </section>
+            <UpText />
             {/* فیلترها */}
-            <section class="border-b border-gray-100 bg-white sticky top-0 z-30">
+            <section class="border-y border-gray-100 bg-white shadow-sm">
                 <div class="container mx-auto px-6 py-6">
                     <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-
                         {/* search */}
                         <div class="flex-1 w-full max-w-xl">
                             <div class="relative">
                                 <input
                                     type="text"
                                     placeholder="جستجو در محصولات..."
-                                    class="w-full px-4 py-3 bg-gray-50 rounded-lg focus:ring-2 focus:ring-green-500"
+                                    class="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                                     value={searchText.value}
                                     onInput$={(e) => (searchText.value = (e.target as HTMLInputElement).value)}
                                 />
-                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                     🔍
                                 </div>
                             </div>
@@ -123,7 +88,7 @@ export default component$(() => {
 
                         {/* brand */}
                         <select
-                            class="px-4 cursor-pointer py-3 bg-gray-50 rounded-lg"
+                            class="px-4 cursor-pointer py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange$={(e) => (selectedBrand.value = (e.target as HTMLSelectElement).value)}
                         >
                             <option value="">همه برندها</option>
@@ -133,7 +98,7 @@ export default component$(() => {
 
                         {/* model */}
                         <select
-                            class="px-4 cursor-pointer py-3 bg-gray-50 rounded-lg"
+                            class="px-4 cursor-pointer py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange$={(e) => (selectedModel.value = (e.target as HTMLSelectElement).value)}
                         >
                             <option value="">همه انواع</option>
@@ -143,7 +108,7 @@ export default component$(() => {
 
                         {/* size */}
                         <select
-                            class="px-4 cursor-pointer py-3 bg-gray-50 rounded-lg"
+                            class="px-4 cursor-pointer py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange$={(e) => (selectedSize.value = (e.target as HTMLSelectElement).value)}
                         >
                             <option value="">همه سایزها</option>
@@ -163,29 +128,34 @@ export default component$(() => {
                     value={productsResource}
                     onPending={() => (
                         <div class="flex justify-center items-center py-20">
-                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                            <div class="relative">
+                                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-green-600 font-semibold">در حال بارگیری...</span>
+                                </div>
+                            </div>
                         </div>
                     )}
                     onRejected={() => (
                         <div class="text-center py-20">
-                            <div class="text-gray-400 mb-4">
-                                {/* ... */}
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">خطا در دریافت محصولات</h3>
-                            <p class="text-gray-600">لطفاً دوباره تلاش کنید</p>
+                            <div class="text-gray-400 mb-4 text-6xl">⚠️</div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">خطا در دریافت محصولات</h3>
+                            <p class="text-gray-600 mb-6">لطفاً دوباره تلاش کنید</p>
+                            <button 
+                                onClick$={() => window.location.reload()}
+                                class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                            >
+                                تلاش مجدد
+                            </button>
                         </div>
                     )}
                     onResolved={(products: Product[]) => {
                         const allProducts: Product[] = products ?? [];
-
-
                         const q = normalizeText(searchText.value);
+                        
                         const filtered: Product[] = allProducts.filter((product: Product) => {
                             const normalizedName = normalizeText(product.name);
-
-                            const matchSearch =
-                                q === '' || normalizedName.includes(q);
-
+                            const matchSearch = q === '' || normalizedName.includes(q);
                             const matchBrand = selectedBrand.value ? product.brand === selectedBrand.value : true;
                             const matchModel = selectedModel.value ? product.model === selectedModel.value : true;
                             const matchSize = selectedSize.value ? product.packageSize === selectedSize.value : true;
@@ -195,64 +165,113 @@ export default component$(() => {
 
                         return (
                             <>
+                                <div class="mb-8 flex items-center justify-between">
+                                    <h2 class="text-2xl font-bold text-gray-900">
+                                        محصولات موجود 
+                                        {filtered.length > 0 && (
+                                            <span class="text-green-600 mr-2"> ({filtered.length} محصول)</span>
+                                        )}
+                                    </h2>
+                                    
+                                    <div class="text-sm text-gray-500">
+                                        <span class="ml-2">🔄</span>
+                                        به روزرسانی لحظه‌ای
+                                    </div>
+                                </div>
+                                
                                 {filtered.length === 0 ? (
                                     <div class="text-center py-20">
-                                        <div class="text-gray-300 mb-4">
-                                            {/* ... آیکون و متن خالی ... */}
-                                        </div>
-                                        <h3 class="text-xl font-semibold text-gray-900 mb-2">محصولی یافت نشد</h3>
-                                        <p class="text-gray-600">به زودی محصولات جدید اضافه خواهند شد</p>
+                                        <div class="text-gray-300 mb-4 text-8xl">🌱</div>
+                                        <h3 class="text-2xl font-bold text-gray-900 mb-2">محصولی یافت نشد</h3>
+                                        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                                            متأسفانه با فیلترهای انتخابی شما محصولی یافت نشد. لطفاً فیلترها را تغییر دهید یا عبارت جستجوی دیگری را امتحان کنید.
+                                        </p>
+                                        <button 
+                                            onClick$={() => {
+                                                searchText.value = '';
+                                                selectedBrand.value = '';
+                                                selectedModel.value = '';
+                                                selectedSize.value = '';
+                                            }}
+                                            class="px-6 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all duration-300"
+                                        >
+                                            حذف همه فیلترها
+                                        </button>
                                     </div>
                                 ) : (
-                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                         {filtered.map((product: Product) => (
                                             <a
                                                 key={product._id}
                                                 href={`/Products/${product._id}`}
-                                                class="group bg-white rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300 overflow-hidden block"
+                                                class="group bg-white rounded-2xl border border-gray-200 hover:border-green-300 hover:shadow-2xl transition-all duration-300 overflow-hidden block transform hover:-translate-y-1"
                                             >
                                                 {/* تصویر محصول */}
-                                                <div class="relative aspect-w-16 aspect-h-12 bg-gray-100 overflow-hidden">
+                                                <div class="relative aspect-w-16 aspect-h-12 bg-linear-to-br from-gray-50 to-gray-100 overflow-hidden">
                                                     {product.image ? (
                                                         <img
                                                             src={getFullImageUrl(product.image)}
                                                             alt={product.name}
-                                                            class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                                                            class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
+                                                            loading="lazy"
                                                         />
                                                     ) : (
-                                                        <div class="w-full h-48 flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 text-gray-400">
-                                                            {/* ... placeholder svg ... */}
+                                                        <div class="w-full h-48 flex items-center justify-center">
+                                                            <div class="text-gray-300 text-6xl">🌾</div>
                                                         </div>
                                                     )}
 
                                                     {/* برچسب برند */}
                                                     <div
-                                                        class={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${getBrandColor(product.brand) === 'blue' ? 'bg-blue-500 text-white' : 'bg-orange-500 text-white'
-                                                            }`}
+                                                        class={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md ${getBrandColor(product.brand) === 'blue' 
+                                                            ? 'bg-linear-to-r from-blue-500 to-sky-600 text-white' 
+                                                            : 'bg-linear-to-r from-orange-500 to-amber-600 text-white'}`}
                                                     >
                                                         {product.brand}
+                                                    </div>
+                                                    
+                                                    {/* برچسب نوع محصول */}
+                                                    <div
+                                                        class={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md ${getModelColor(product.model) === 'green' 
+                                                            ? 'bg-linear-to-r from-green-500 to-emerald-600 text-white' 
+                                                            : 'bg-linear-to-r from-purple-500 to-indigo-600 text-white'}`}
+                                                    >
+                                                        {product.model}
                                                     </div>
                                                 </div>
 
                                                 {/* محتوای محصول */}
-                                                <div class="p-5">
-                                                    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">{product.name}</h3>
+                                                <div class="p-6">
+                                                    <h3 class="font-bold text-gray-900 mb-3 line-clamp-2 leading-tight text-lg group-hover:text-green-700 transition-colors">
+                                                        {product.name}
+                                                    </h3>
 
-                                                    <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">{product.content}</p>
+                                                    <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                                        {product.content}
+                                                    </p>
 
-                                                    <div class="flex items-center justify-between mb-4">
-                                                        <span
-                                                            class={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getModelColor(product.model) === 'green' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'
-                                                                }`}
-                                                        >
-                                                            {product.model}
+                                                    <div class="flex items-center justify-between mb-6">
+                                                        <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                                                            📦 {formatPackageSize(product.packageSize)}
                                                         </span>
-                                                        <span class="text-sm text-gray-500 font-medium">{formatPackageSize(product.packageSize)}</span>
+                                                        <div class="flex items-center text-amber-500">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <span key={i} class="text-sm">★</span>
+                                                            ))}
+                                                        </div>
                                                     </div>
 
-                                                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                                        <div class="text-lg font-bold text-gray-900">{formatPrice(product.price)}</div>
-                                                        <div class="text-green-600 text-sm font-medium group-hover:text-green-700">مشاهده جزئیات →</div>
+                                                    <div class="flex items-center justify-between pt-5 border-t border-gray-100">
+                                                        <div>
+                                                            <div class="text-lg font-bold text-gray-900">
+                                                                {formatPrice(product.price)}
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 mt-1">قیمت نهایی با مالیات</div>
+                                                        </div>
+                                                        <div class="text-green-600 text-sm font-semibold group-hover:text-green-700 flex items-center">
+                                                            مشاهده جزئیات
+                                                            <span class="mr-2 group-hover:mr-0 group-hover:ml-2 transition-all duration-300">→</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </a>
@@ -263,7 +282,6 @@ export default component$(() => {
                         );
                     }}
                 />
-
             </main>
         </div>
     );

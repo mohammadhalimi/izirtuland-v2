@@ -47,7 +47,6 @@
     "@types/js-cookie": "^3.0.6",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
-    "qwik-icons": "^0.0.1",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "swiper": "^12.0.3"

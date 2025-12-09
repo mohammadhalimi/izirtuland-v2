@@ -55,7 +55,7 @@ export const ConfirmationModal = component$<{
             </div>
             <button
               onClick$={props.onClose}
-              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
               aria-label="بستن"
             >
               <XIcon />
@@ -74,7 +74,7 @@ export const ConfirmationModal = component$<{
             <button
               onClick$={props.onConfirm}
               disabled={props.isProcessing}
-              class={`flex-1 ${content.confirmColor} text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+              class={`flex-1 ${content.confirmColor} text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer`}
             >
               {props.isProcessing ? (
                 <>
@@ -88,7 +88,7 @@ export const ConfirmationModal = component$<{
             <button
               onClick$={props.onClose}
               disabled={props.isProcessing}
-              class="flex-1 py-3 px-6 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 py-3 px-6 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               انصراف
             </button>

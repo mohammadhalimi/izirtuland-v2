@@ -162,7 +162,7 @@ export default component$(() => {
 
   const totalPrice = cart.items.reduce((sum: number, it: any) => sum + (it.price * it.quantity), 0);
   const totalItems = cart.items.reduce((sum: number, it: any) => sum + it.quantity, 0);
-  const shippingThreshold = 500000;
+  const shippingThreshold = 10000000;
   const shippingCost = totalPrice >= shippingThreshold ? 0 : 25000;
   const estimatedTax = Math.floor(totalPrice * 0.09);
   const discount = 0;
@@ -191,23 +191,14 @@ export default component$(() => {
       <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-20">
-            <a href="/products" class="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors font-medium group">
+            <a href="/Products" class="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors font-medium group">
               <ArrowLeftIcon />
               <span class="hidden sm:inline">بازگشت به فروشگاه</span>
               <span class="sm:hidden">بازگشت</span>
             </a>
             
             <div class="flex items-center gap-4">
-              <div class="relative">
-                <div class="w-12 h-12 rounded-full bg-linear-to-br from-green-100 to-emerald-100 flex items-center justify-center shadow-sm">
-                  <CartIcon />
-                </div>
-                {totalItems > 0 && (
-                  <span class="absolute -top-1 -right-1 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
-                    {totalItems}
-                  </span>
-                )}
-              </div>
+              
               <div class="text-right">
                 <h1 class="text-2xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   سبد خرید
@@ -478,7 +469,7 @@ export default component$(() => {
                   <div class="p-6">
                     <div class="space-y-4">
                       {[
-                        { label: `قیمت کالاها (${totalItems} آیتم)`, value: totalPrice, color: 'text-gray-900' },
+                        { label: `قیمت کالاها (${totalItems} بسته)`, value: totalPrice, color: 'text-gray-900' },
                         { label: 'هزینه حمل و نقل', value: shippingCost, color: shippingCost === 0 ? 'text-green-600' : 'text-gray-900' },
                         { label: 'مالیات و عوارض', value: estimatedTax, color: 'text-gray-900' },
                         { label: 'تخفیف', value: -discount, color: 'text-green-600' },
