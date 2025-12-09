@@ -122,14 +122,6 @@ export default component$(() => {
         return sizeMap[packageSize] || packageSize;
     };
 
-    const formatDate = (dateString: string) => {
-        try {
-            return new Date(dateString).toLocaleDateString('fa-IR');
-        } catch {
-            return dateString;
-        }
-    };
-
     return (
         <div class="min-h-screen bg-linear-to-br from-gray-50 to-white">
             {/* هدر */}
