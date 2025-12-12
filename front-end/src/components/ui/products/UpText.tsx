@@ -187,30 +187,42 @@ export const UpText = component$(() => {
                                     </p>
 
                                     <div class="bg-white rounded-xl p-5 border border-blue-200">
-                                        <h4 class="font-semibold text-blue-800 mb-3 flex items-center">
-                                            <span class="ml-2">🚚</span>
-                                            نحوه ارسال سفارش
+                                        <h4 class="font-semibold text-blue-800 mb-4 flex items-center">
+                                            <span class="ml-2">✅</span>
+                                            مزایای کلیدی ایزیرتولند
                                         </h4>
-                                        <ol class="space-y-3">
-                                            {[
-                                                'ثبت سفارش از طریق وب‌سایت',
-                                                'تأیید سفارش توسط تیم پشتیبانی',
-                                                'بسته‌بندی ایمن و تخصصی',
-                                                'ارسال سریع با حمل‌ونقل معتبر',
-                                                'پیگیری آنلاین سفارش'
-                                            ].map((step, index) => (
-                                                <li key={index} class="flex items-start text-gray-700">
-                                                    <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm ml-3 mt-1">{index + 1}</span>
-                                                    <span>{step}</span>
-                                                </li>
-                                            ))}
-                                        </ol>
+                                        <ul class="space-y-3">
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">استفاده از فناوری‌های نوین در تولید کودها</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">تحقیق و توسعه مستمر برای بهبود فرمولاسیون</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">کیفیت بالا و استانداردهای بین‌المللی</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">تأمین مواد اولیه مرغوب و با کیفیت</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">پشتیبانی فنی و مشاوره تخصصی</span>
+                                            </li>
+                                            <li class="flex items-start">
+                                                <span class="text-blue-500 ml-3 mt-1">✓</span>
+                                                <span class="text-gray-700">گواهی‌نامه‌های کیفیت و سلامت محصولات</span>
+                                            </li>
+                                        </ul>
                                     </div>
 
                                     <div class="mt-6 pt-6 border-t border-blue-200">
                                         <p class="text-gray-600 text-center mb-4">📞 برای مشاوره و سفارش:</p>
                                         <a href="tel:09308292601" class="block text-center bg-linear-to-r from-blue-600 to-sky-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
-                                            ۰۹۳۰۸۲۹۲۶۰۱
+                                            ۰۹۱۲۸۹۲۸۷۶۹
                                         </a>
                                     </div>
                                 </div>
@@ -261,6 +273,99 @@ export const UpText = component$(() => {
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* بخش نحوه سفارش (در انتها و برای همه محصولات) */}
+            <section class="py-16 bg-linear-to-r from-green-50 to-emerald-50">
+                <div class="container mx-auto px-6">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                                نحوه سفارش و دریافت محصولات
+                            </h2>
+                            <p class="text-gray-600 text-lg">
+                                سفارش محصولات پربار باغستان به سادگی چند کلیک
+                            </p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-xl p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <span class="ml-3">📋</span>
+                                        مراحل سفارش
+                                    </h3>
+                                    <ol class="space-y-6">
+                                        {[
+                                            {
+                                                step: '۱',
+                                                title: 'انتخاب محصول',
+                                                desc: 'محصول مورد نظر خود را از لیست محصولات انتخاب کنید'
+                                            },
+                                            {
+                                                step: '۲',
+                                                title: 'افزودن به سبد خرید',
+                                                desc: 'محصول انتخاب شده را به سبد خرید اضافه کنید'
+                                            },
+                                            {
+                                                step: '۳',
+                                                title: 'تکمیل اطلاعات',
+                                                desc: 'اطلاعات شخصی و آدرس خود را وارد نمایید'
+                                            },
+                                            {
+                                                step: '۴',
+                                                title: 'تأیید نهایی',
+                                                desc: 'سفارش خود را نهایی کرده و منتظر تماس همکاران ما باشید'
+                                            }
+                                        ].map((item, index) => (
+                                            <li key={index} class="flex items-start">
+                                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-lg shrink-0">
+                                                    {item.step}
+                                                </div>
+                                                <div class="mr-4">
+                                                    <h4 class="font-bold text-gray-800">{item.title}</h4>
+                                                    <p class="text-gray-600 text-sm mt-1">{item.desc}</p>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <span class="ml-3">🚚</span>
+                                        نحوه ارسال
+                                    </h3>
+                                    <div class="space-y-6">
+                                        <div class="bg-gray-50 rounded-xl p-5">
+                                            <h4 class="font-bold text-gray-800 mb-3">ارسال در تهران</h4>
+                                            <p class="text-gray-600 text-sm">تحویل در کمتر از ۲۴ ساعت</p>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-5">
+                                            <h4 class="font-bold text-gray-800 mb-3">ارسال به شهرستان</h4>
+                                            <p class="text-gray-600 text-sm">تحویل در ۴۸ تا ۷۲ ساعت</p>
+                                        </div>
+                                        <div class="bg-green-50 rounded-xl p-5 border border-green-200">
+                                            <h4 class="font-bold text-green-800 mb-3">پشتیبانی ۲۴ ساعته</h4>
+                                            <p class="text-green-700 text-sm">
+                                                همکاران ما ۲۴ ساعته آماده پاسخگویی به سوالات شما هستند
+                                            </p>
+                                            <a href="tel:09308292601" class="inline-block mt-3 text-green-600 font-semibold hover:text-green-800 transition-colors">
+                                                📞 ۰۹۱۲۸۹۲۸۷۶۹
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-10 pt-10 border-t border-gray-200">
+                                <p class="text-center text-gray-700 font-medium">
+                                    تمامی محصولات پربار باغستان با بهترین کیفیت و مناسب ترین قیمت عرضه می‌شوند
+                                </p>
                             </div>
                         </div>
                     </div>
