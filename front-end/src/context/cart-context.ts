@@ -1,4 +1,3 @@
-// cart-context.ts
 import { createContextId, type QRL } from '@builder.io/qwik';
 
 export interface CartItem {
@@ -21,6 +20,8 @@ export interface CartState {
   clearCart?: QRL<() => void>;
   getTotalPrice?: QRL<() => number>;
   getTotalItems?: QRL<() => number>;
+  isInCart?: QRL<(id: string) => boolean>; 
+  getItemQuantity?: QRL<(id: string) => number>;
 }
 
 export const CartContext = createContextId<CartState>('cart-context');

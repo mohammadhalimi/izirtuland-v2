@@ -7,9 +7,6 @@ import authRoutes from "./routes/authRotes";
 import postRoutes from "./routes/postRoutes";
 import productRotes from "./routes/productRotes"
 import cookieParser from "cookie-parser";
-
-// import smsRoute from "./routes/smsRoute"
-
 import authUserRoutes from "./routes/authUserRoutes";
 import userRoutes from "./routes/userRoutes";
 

@@ -1,5 +1,5 @@
 // cart-provider.tsx
-import { component$, useStore, useContextProvider, Slot, useVisibleTask$, $ } from '@builder.io/qwik';
+import { component$, useStore, useContextProvider, Slot, useTask$, $, useVisibleTask$ } from '@builder.io/qwik';
 import type { CartState, CartItem } from './cart-context';
 import { CartContext } from './cart-context';
 
@@ -7,16 +7,9 @@ export const CartProvider = component$(() => {
   const cart = useStore<CartState>({
     items: [],
     loaded: false,
-    // تابع‌ها ابتدا undefined تعریف می‌شوند
-    addItem: undefined,
-    removeItem: undefined,
-    updateQuantity: undefined,
-    clearCart: undefined,
-    getTotalPrice: undefined,
-    getTotalItems: undefined,
   });
 
-  // بارگذاری اولیه از localStorage
+  // بارگذاری اولیه از localStorage (فقط در کلاینت)
   useVisibleTask$(() => {
     console.log('CartProvider: Loading from localStorage...');
     const saved = localStorage.getItem('perebar_cart');
@@ -36,21 +29,20 @@ export const CartProvider = component$(() => {
       console.log('No saved cart found in localStorage');
     }
     cart.loaded = true;
-    
-    // ردیابی تغییرات بین تب‌ها و پنجره‌ها
+  });
+
+  // ردیابی تغییرات بین تب‌ها
+  useVisibleTask$(({ cleanup }) => {
     const handleStorageChange = (event: StorageEvent) => {
-      console.log('Storage event detected:', event.key);
       if (event.key === 'perebar_cart') {
         try {
           if (event.newValue) {
             const parsed = JSON.parse(event.newValue);
             if (Array.isArray(parsed)) {
-              cart.items = parsed;
-              console.log('Cart updated from other tab:', parsed);
+              cart.items = [...parsed];
             }
           } else {
             cart.items = [];
-            console.log('Cart cleared from other tab');
           }
         } catch (error) {
           console.error('Error parsing cart from storage event:', error);
@@ -59,53 +51,98 @@ export const CartProvider = component$(() => {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    cleanup(() => window.removeEventListener('storage', handleStorageChange));
   });
 
-  // تعریف توابع مدیریت سبد خرید
-  useVisibleTask$(() => {
-    cart.addItem = $((item: CartItem) => {
-      console.log('Adding item to cart:', item);
-      const existing = cart.items.find(i => i.id === item.id);
-      if (existing) {
-        existing.quantity += item.quantity;
+  // Helper function to save to localStorage safely
+  const saveToLocalStorage = $((items: CartItem[]) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('perebar_cart', JSON.stringify(items));
+    }
+  });
+
+  // تعریف توابع
+  cart.addItem = $(async (item: CartItem) => {
+    console.log('Adding item to cart:', item);
+    const existingIndex = cart.items.findIndex(i => i.id === item.id);
+    
+    if (existingIndex >= 0) {
+      // Update existing item
+      cart.items[existingIndex].quantity += item.quantity;
+      // Create new array reference for reactivity
+      cart.items = [...cart.items];
+    } else {
+      // Add new item
+      cart.items = [...cart.items, { ...item }];
+    }
+    
+    await saveToLocalStorage(cart.items);
+    
+    // Dispatch custom event
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+    }
+  });
+
+  cart.removeItem = $(async (id: string) => {
+    console.log('Removing item from cart:', id);
+    cart.items = cart.items.filter(item => item.id !== id);
+    await saveToLocalStorage(cart.items);
+    
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+    }
+  });
+
+  cart.updateQuantity = $(async (id: string, quantity: number) => {
+    console.log('Updating quantity for item:', id, 'to', quantity);
+    const item = cart.items.find(i => i.id === id);
+    
+    if (item) {
+      if (quantity <= 0) {
+        cart.items = cart.items.filter(i => i.id !== id);
       } else {
-        cart.items.push({ ...item });
+        item.quantity = quantity;
+        // Create new array reference for reactivity
+        cart.items = [...cart.items];
       }
-      localStorage.setItem('perebar_cart', JSON.stringify(cart.items));
-      console.log('Cart saved to localStorage:', cart.items);
-    });
-
-    cart.removeItem = $((id: string) => {
-      console.log('Removing item from cart:', id);
-      cart.items = cart.items.filter(item => item.id !== id);
-      localStorage.setItem('perebar_cart', JSON.stringify(cart.items));
-      console.log('Cart saved to localStorage after removal:', cart.items);
-    });
-
-    cart.updateQuantity = $((id: string, quantity: number) => {
-      console.log('Updating quantity for item:', id, 'to', quantity);
-      const item = cart.items.find(i => i.id === id);
-      if (item) {
-        item.quantity = Math.max(1, quantity);
-        localStorage.setItem('perebar_cart', JSON.stringify(cart.items));
-        console.log('Cart saved to localStorage after quantity update:', cart.items);
+      
+      await saveToLocalStorage(cart.items);
+      
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cart-updated'));
       }
-    });
+    }
+  });
 
-    cart.clearCart = $(() => {
-      console.log('Clearing cart');
-      cart.items = [];
+  cart.clearCart = $(async () => {
+    console.log('Clearing cart');
+    cart.items = [];
+    
+    if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem('perebar_cart');
-    });
+    }
+    
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+    }
+  });
 
-    cart.getTotalPrice = $(() => {
-      return cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    });
+  cart.getTotalPrice = $(() => {
+    return cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  });
 
-    cart.getTotalItems = $(() => {
-      return cart.items.reduce((sum, item) => sum + item.quantity, 0);
-    });
+  cart.getTotalItems = $(() => {
+    return cart.items.reduce((sum, item) => sum + item.quantity, 0);
+  });
+
+  cart.isInCart = $((id: string) => {
+    return cart.items.some(item => item.id === id);
+  });
+
+  cart.getItemQuantity = $((id: string) => {
+    const item = cart.items.find(item => item.id === id);
+    return item ? item.quantity : 0;
   });
 
   useContextProvider(CartContext, cart);

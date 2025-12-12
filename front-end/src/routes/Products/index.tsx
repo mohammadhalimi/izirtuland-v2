@@ -254,11 +254,6 @@ export default component$(() => {
                                                         <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
                                                             📦 {formatPackageSize(product.packageSize)}
                                                         </span>
-                                                        <div class="flex items-center text-amber-500">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <span key={i} class="text-sm">★</span>
-                                                            ))}
-                                                        </div>
                                                     </div>
 
                                                     <div class="flex items-center justify-between pt-5 border-t border-gray-100">
@@ -266,7 +261,6 @@ export default component$(() => {
                                                             <div class="text-lg font-bold text-gray-900">
                                                                 {formatPrice(product.price)}
                                                             </div>
-                                                            <div class="text-xs text-gray-500 mt-1">قیمت نهایی با مالیات</div>
                                                         </div>
                                                         <div class="text-green-600 text-sm font-semibold group-hover:text-green-700 flex items-center">
                                                             مشاهده جزئیات
