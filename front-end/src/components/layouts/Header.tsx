@@ -186,36 +186,6 @@ export default component$(() => {
                 'opacity-0 invisible translate-x-full'
               }
         `}>
-              {/* نمایش سبد خرید در منوی موبایل */}
-              {state.uniqueProductCount > 0 && (
-                <div key={`mobile-cart-${state.cartVersion}`} class="mb-4 px-4">
-                  <Link
-                    href="/Card"
-                    class="flex items-center justify-between bg-linear-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200 hover:border-green-300 transition-colors"
-                    onClick$={() => isMenuOpen.value = false}
-                  >
-                    <div class="flex items-center gap-3">
-                      <div class="relative">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        <div class="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">
-                          {state.uniqueProductCount}
-                        </div>
-                      </div>
-                      <div>
-                        <div class="font-medium text-green-700">سبد خرید</div>
-                        <div class="text-xs text-gray-500">
-                          {state.uniqueProductCount} محصول
-                        </div>
-                      </div>
-                    </div>
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </Link>
-                </div>
-              )}
               <div class="py-6 space-y-4 px-6">
                 <Link
                   href="/"

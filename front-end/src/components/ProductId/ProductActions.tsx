@@ -6,20 +6,22 @@ import type { Product } from '~/components/types/product';
 interface ProductActionsProps {
     product: Product;
     isProductInCart: boolean;
+    isAddingToCart: boolean; // اضافه شده
     onAddToCart: () => void; // این حالا یک QRL است
 }
 
-export const ProductActions = component$<ProductActionsProps>(({ 
-    product, 
-    isProductInCart, 
-    onAddToCart 
+export const ProductActions = component$<ProductActionsProps>(({
+    product,
+    isProductInCart,
+    isAddingToCart,
+    onAddToCart
 }) => {
     return (
         <div class="space-y-6">
             {isProductInCart && (
                 <div class="bg-linear-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4 md:p-6">
                     <div class="flex items-center">
-                        <span class="text-xl md:text-2xl text-green-600 mr-3">✅</span>
+                        <span class="text-xl md:text-2xl text-green-600 mr-3"><style dangerouslySetInnerHTML={'✅'}/></span>
                         <div>
                             <h3 class="font-bold text-green-800 text-sm md:text-base">
                                 این محصول در سبد خرید شما موجود است
@@ -44,26 +46,37 @@ export const ProductActions = component$<ProductActionsProps>(({
             <button
                 data-product-id={product._id}
                 onClick$={onAddToCart} // استفاده مستقیم از QRL
-                disabled={isProductInCart}
-                class={`w-full py-4 md:py-5 rounded-2xl font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 relative overflow-hidden group cursor-pointer ${
-                    isProductInCart
-                        ? 'bg-linear-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed'
+                disabled={isProductInCart || isAddingToCart}
+                class={`w-full py-4 md:py-5 rounded-2xl font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 relative overflow-hidden group cursor-pointer ${isProductInCart
+                    ? 'bg-linear-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed'
+                    : isAddingToCart
+                        ? 'bg-linear-to-r from-yellow-500 to-amber-500 text-white cursor-wait'
                         : 'bg-linear-to-r from-green-600 via-emerald-500 to-green-600 text-white hover:shadow-2xl hover:shadow-green-500/50'
-                }`}
+                    }`}
             >
-                <div class={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                    isProductInCart
-                        ? 'bg-linear-to-r from-gray-500 to-gray-600'
+                <div class={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isProductInCart
+                    ? 'bg-linear-to-r from-gray-500 to-gray-600'
+                    : isAddingToCart
+                        ? 'bg-linear-to-r from-amber-500 to-yellow-500'
                         : 'bg-linear-to-r from-emerald-600 to-green-600'
-                }`}></div>
-                
+                    }`}></div>
+
                 <span class="relative flex items-center justify-center">
-                    <span class="mr-2 md:mr-3 text-xl md:text-2xl">
-                        {isProductInCart ? '✅' : '🛒'}
-                    </span>
-                    {isProductInCart ? 'موجود در سبد خرید' : 'افزودن به سبد خرید'}
-                    {!isProductInCart && (
-                        <span class="mr-2 group-hover:mr-0 group-hover:ml-2 transition-all duration-300">→</span>
+                    {isAddingToCart ? (
+                        <>
+                            <span class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></span>
+                            در حال افزودن...
+                        </>
+                    ) : (
+                        <>
+                            <span class="mr-2 md:mr-3 text-xl md:text-2xl">
+                                {isProductInCart ? <style dangerouslySetInnerHTML={'✅'}/>  : <style dangerouslySetInnerHTML={'🛒'}/> }
+                            </span>
+                            {isProductInCart ? 'موجود در سبد خرید' : 'افزودن به سبد خرید'}
+                            {!isProductInCart && (
+                                <span class="mr-2 group-hover:mr-0 group-hover:ml-2 transition-all duration-300">→</span>
+                            )}
+                        </>
                     )}
                 </span>
             </button>

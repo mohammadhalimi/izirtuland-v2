@@ -1,31 +1,8 @@
 import { component$ } from "@builder.io/qwik";
-import { Link } from "@builder.io/qwik-city";
 
 export const UpText = component$(() => {
     return (
         <>
-            {/* هدر مینیمال */}
-            <header class="border-b border-gray-100">
-                <div class="container mx-auto px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                            <Link
-                                href="/"
-                                class="text-2xl font-bold text-gray-900 hover:text-green-600 transition-colors duration-200"
-                            >
-                                پربارباغستان
-                            </Link>
-                            <div class="h-6 w-px bg-gray-200"></div>
-                            <nav class="flex items-center space-x-6 text-sm text-gray-600 px-2">
-                                <Link href="/" class="hover:text-gray-900 transition-colors">خانه</Link>
-                                <span class="text-green-600 font-medium">محصولات</span>
-                                <Link href="/Blog" class="hover:text-gray-900 transition-colors">بلاگ</Link>
-                                <Link href="/About" class="hover:text-gray-900 transition-colors">درباره ما</Link>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </header>
             {/* هیرو سکشن */}
             <section class="bg-linear-to-br from-gray-50 to-white py-16">
                 <div class="container mx-auto px-6">

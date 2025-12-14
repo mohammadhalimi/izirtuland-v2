@@ -19,8 +19,7 @@ interface ProductSliderProps {
 export default component$<ProductSliderProps>(({
   products,
   title = "محصولات مرتبط",
-  apiBaseUrl,
-  onAddToCart
+  apiBaseUrl
 }) => {
   const sliderContainerRef = useSignal<HTMLDivElement>();
   const swiperInstance = useSignal<Swiper | null>(null);
@@ -315,12 +314,6 @@ export default component$<ProductSliderProps>(({
                                 </div>
                               </div>
                             )}
-
-                            {/* توضیحات مختصر */}
-                            <p class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
-                              {product.content || 'محصول با کیفیت عالی و استانداردهای بین‌المللی'}
-                            </p>
-
                             {/* قیمت و دکمه */}
                             <div class="mt-auto pt-4 border-t border-gray-100">
                               <div class="flex items-center justify-between">

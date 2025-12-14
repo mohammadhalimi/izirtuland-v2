@@ -24,15 +24,15 @@ export const useProduct = routeLoader$(async (requestEvent) => {
     }
 
     const apiUrl = `${API_BASE_URL}/api/product/${params.id}`;
-    
+
     try {
         const response = await fetch(apiUrl);
-        
+
         if (!response.ok) {
             status(response.status);
             return null;
         }
-        
+
         const data = await response.json();
 
         const product: Product = {
@@ -61,37 +61,38 @@ export default component$(() => {
     const productId = location.params.id;
     const productResource = useProduct();
     const cart = useContext(CartContext);
-    
+
     // سیگنال‌های نوتیفیکیشن
     const showNotification = useSignal(false);
     const notificationMessage = useSignal('');
     const notificationType = useSignal<'success' | 'error' | 'info'>('success');
-    
+
     // سیگنال وضعیت محصول در سبد
     const isProductInCart = useSignal(false);
-    
+    const isAddingToCart = useSignal(false); // برای disable کردن دکمه هنگام افزودن
+
     // تابع بستن نوتیفیکیشن
     const handleCloseNotification = $(() => {
         showNotification.value = false;
     });
-    
+
     // تایمر خودکار بسته شدن نوتیفیکیشن
     useVisibleTask$(({ track, cleanup }) => {
         track(() => showNotification.value);
-        
+
         if (showNotification.value) {
             const timer = setTimeout(() => {
                 showNotification.value = false;
             }, 4000);
-            
+
             cleanup(() => clearTimeout(timer));
         }
     });
-    
-    // بررسی وضعیت محصول در سبد
+
+    // بررسی وضعیت محصول در سبد (در useTask$)
     useTask$(async ({ track }) => {
         track(() => cart.items);
-        
+
         if (cart.isInCart) {
             try {
                 const exists = await cart.isInCart(productId);
@@ -101,32 +102,34 @@ export default component$(() => {
             }
         }
     });
-    
+
     // توابع نوتیفیکیشن
     const showSuccessNotification = $((message: string) => {
         notificationMessage.value = message;
         notificationType.value = 'success';
         showNotification.value = true;
     });
-    
+
     const showErrorNotification = $((message: string) => {
         notificationMessage.value = message;
         notificationType.value = 'error';
         showNotification.value = true;
     });
-    
-    // تابع اصلی افزودن به سبد خرید
+
+    // تابع اصلی افزودن به سبد خرید - حالا به درستی wrap شده
     const addToCart = $(async (product: Product) => {
         if (!cart.addItem) {
             showErrorNotification('سیستم سبد خرید آماده نیست. لطفاً صفحه را رفرش کنید.');
             return;
         }
-        
+
+        isAddingToCart.value = true;
+
         try {
             // بررسی وجود محصول در سبد
             if (cart.isInCart) {
                 const isAlreadyInCart = await cart.isInCart(product._id);
-                
+
                 if (isAlreadyInCart) {
                     showSuccessNotification(
                         `✅ "${product.name}"\n` +
@@ -136,7 +139,7 @@ export default component$(() => {
                     return;
                 }
             }
-            
+
             // افزودن محصول جدید
             const cartItem: CartItem = {
                 id: product._id,
@@ -148,14 +151,14 @@ export default component$(() => {
                 model: product.model,
                 image: product.image
             };
-            
+
             await cart.addItem(cartItem);
-            
+
             showSuccessNotification(`✅ "${product.name}"\nبا موفقیت به سبد خرید اضافه شد!`);
-            
+
             // به‌روزرسانی وضعیت
             isProductInCart.value = true;
-            
+
             // افکت بصری
             const btn = document.querySelector(`[data-product-id="${product._id}"]`);
             if (btn) {
@@ -164,18 +167,19 @@ export default component$(() => {
                     btn.classList.remove('animate-vibrate');
                 }, 300);
             }
-            
+
         } catch (error) {
             console.error('Error in addToCart:', error);
             showErrorNotification('❌ خطا در افزودن محصول به سبد خرید!\nلطفاً دوباره تلاش کنید.');
+        } finally {
+            isAddingToCart.value = false;
         }
     });
-    
+
     // تابع QRL شده برای پاس دادن به کامپوننت‌ها
     const handleAddToCart = $(async (product: Product) => {
         await addToCart(product);
     });
-    
     // دریافت محصولات مرتبط
     const relatedProductsResource = useResource$<Product[]>(async () => {
         try {
@@ -183,11 +187,11 @@ export default component$(() => {
             if (response.ok) {
                 const allProducts: Product[] = await response.json();
                 const filteredProducts = allProducts.filter(p => p._id !== productId);
-                
+
                 if (filteredProducts.length <= 4) {
                     return filteredProducts;
                 }
-                
+
                 const shuffled = [...filteredProducts].sort(() => 0.5 - Math.random());
                 return shuffled.slice(0, 6);
             }
@@ -201,7 +205,7 @@ export default component$(() => {
     return (
         <div class="min-h-screen bg-linear-to-br from-gray-50 to-white">
             <CSSAnimations />
-            
+
             <Notification
                 message={notificationMessage.value}
                 type={notificationType.value}
@@ -218,28 +222,28 @@ export default component$(() => {
                         if (!product) {
                             return <NotFoundState productId={productId} />;
                         }
-                        
+
                         // ایجاد تابع QRL شده برای این محصول خاص
                         const onAddToCartProduct = $(() => handleAddToCart(product));
-                        
                         return (
                             <>
                                 {/* محتوای اصلی محصول */}
                                 <div class="max-w-7xl mx-auto">
                                     <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12">
-                                        <ProductImage 
-                                            product={product} 
-                                            apiBaseUrl={API_BASE_URL} 
+                                        <ProductImage
+                                            product={product}
+                                            apiBaseUrl={API_BASE_URL}
                                         />
-                                        
-                                        <ProductInfo 
+
+                                        <ProductInfo
                                             product={product}
                                             isProductInCart={isProductInCart.value}
+                                            isAddingToCart={isAddingToCart.value} // پاس دادن این
                                             onAddToCart={onAddToCartProduct}
                                             apiBaseUrl={API_BASE_URL}
                                         />
                                     </div>
-                                    
+
                                     {/* توضیحات و مشخصات */}
                                     <div class="mt-8 lg:mt-12">
                                         <ProductDescription product={product} />
