@@ -1,10 +1,25 @@
 // src/components/layouts/Header.tsx
-import { component$, useSignal, useStore, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, useContext, useSignal, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
+import { API_BASE_URL } from '~/config/api';
+import { AuthContext } from '~/context/auth-context';
 
 export default component$(() => {
   const isMenuOpen = useSignal(false);
-
+  const auth = useContext(AuthContext);
+  useVisibleTask$(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/user/me`, {
+        credentials: 'include',
+      });
+      const data = await res.json();
+      auth.isAuthenticated = !!data.success;
+    } catch {
+      auth.isAuthenticated = false;
+    } finally {
+      auth.loading = false;
+    }
+  });
   const state = useStore({
     uniqueProductCount: 0, // تعداد محصولات منحصر به فرد
     cartVersion: 0,
@@ -111,12 +126,22 @@ export default component$(() => {
 
           {/* آیکون‌های سمت چپ */}
           <div class="flex items-center space-x-4 rtl:space-x-reverse">
-            <button class="p-2 text-gray-600 hover:text-green-600 transition-colors duration-200 lg:block hidden">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-            </button>
-
+            {!auth.loading && (
+              <Link
+                href="/User"
+                class={`hidden md:flex items-center gap-2 px-3 py-2 rounded transition-colors ${auth.isAuthenticated
+                    ? 'text-green-700 hover:text-green-800 hover:bg-green-50'
+                    : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                  }`}
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-sm">
+                  {auth.isAuthenticated ? 'حساب کاربری' : 'ورود / ثبت‌ نام'}
+                </span>
+              </Link>
+            )}
             <Link href='/Card' class="p-2 text-gray-600 hover:text-green-600 transition-colors duration-200 relative lg:block hidden">
               <div class="relative group">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
