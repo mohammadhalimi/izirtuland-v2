@@ -1,10 +1,8 @@
 // src/components/auth/auth-panel.tsx
 import { component$, useStore, $ } from '@builder.io/qwik';
-import { useNavigate } from '@builder.io/qwik-city';
 import { API_BASE_URL } from '~/config/api';
 
 export default component$(() => {
-  const nav = useNavigate();
   const authState = useStore({
     step: 'login' as 'login' | 'verify',
     phone: '',

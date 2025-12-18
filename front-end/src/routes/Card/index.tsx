@@ -13,7 +13,6 @@ import CartActions from "~/components/Card/CartActions"
 
 export default component$(() => {
   const cart = useContext(CartContext);
-  const isRemoving = useSignal<string | null>(null);
   const isUpdating = useSignal<string | null>(null);
 
   // State برای modal

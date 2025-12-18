@@ -1,5 +1,5 @@
 // src/components/cart/CartSummary.tsx
-import { component$ } from '@builder.io/qwik';
+import { $, component$ } from '@builder.io/qwik';
 import { ArrowRightIcon, ShieldIcon, ReceiptIcon, CheckIcon, TruckIcon } from '~/components/icons';
 
 interface CartSummaryProps {
@@ -8,22 +8,81 @@ interface CartSummaryProps {
   isFreeShipping: boolean;
 }
 
-export default component$<CartSummaryProps>(({ 
-  totalPrice, 
+export default component$<CartSummaryProps>(({
+  totalPrice,
   totalUnits,
-  isFreeShipping 
+  isFreeShipping
 }) => {
   // فقط قیمت کالاها را نمایش می‌دهیم
   const items = [
-    { 
-      label: `قیمت کالاها (${totalUnits} عدد)`, 
-      value: totalPrice, 
-      color: 'text-gray-900' 
+    {
+      label: `قیمت کالاها (${totalUnits} عدد)`,
+      value: totalPrice,
+      color: 'text-gray-900'
     },
   ];
 
+  const check = [
+    {
+      text: "پشتیبانی ۲۴ ساعته در خدمت شماست",
+      id: 1
+    },
+    {
+      text: "حمل و نقل رایگان برای سفارش‌های بالای ۱۰ میلیون تومان",
+      id: 2
+    },
+    {
+      text: "سایر سفارش‌ها: هزینه حمل به صورت جداگانه (پس کرایه) محاسبه می‌شود",
+      id: 3
+    },
+    {
+      text: "ارسال سریع در تهران (۲۴ ساعت) و سایر شهرها (۴۸-۷۲ ساعت)",
+      id: 4
+    },
+    {
+      text: "هزینه دقیق حمل پس از ثبت سفارش توسط پشتیبانی اعلام می‌گردد",
+      id: 5
+    },
+  ]
   // در حالت پس کرایه، فقط قیمت کالاها را نمایش می‌دهیم
   const total = totalPrice;
+const goToCheckout$ = $(() => {
+  const cartStr = localStorage.getItem('perebar_cart');
+  if (!cartStr) return;
+
+  let cartItems: any[] = [];
+  let checkoutItems: any[] = [];
+
+  try {
+    cartItems = JSON.parse(cartStr);
+    if (!Array.isArray(cartItems) || cartItems.length === 0) return;
+
+    const checkoutStr = localStorage.getItem('perebar_checkout');
+    if (checkoutStr) {
+      checkoutItems = JSON.parse(checkoutStr);
+      if (!Array.isArray(checkoutItems)) {
+        checkoutItems = [];
+      }
+    }
+  } catch (err) {
+    console.error('LocalStorage parse error', err);
+    return;
+  }
+
+  // ✅ اضافه شدن آیتم‌های جدید به قبلی‌ها
+  const mergedCheckout = [...checkoutItems, ...cartItems];
+
+  localStorage.setItem(
+    'perebar_checkout',
+    JSON.stringify(mergedCheckout)
+  );
+
+  // خالی کردن سبد خرید
+  localStorage.removeItem('perebar_cart');
+
+  // رفتن به پنل کاربر
+  window.location.assign('/User');
+});
 
   return (
     <div class="sticky top-28">
@@ -123,15 +182,13 @@ export default component$<CartSummaryProps>(({
               </div>
             </div>
           )}
-
-          <button 
-            onClick$={() => { window.location.href = "/checkout"; }}
+          <button
+            onClick$={goToCheckout$}
             class="mt-8 w-full bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 group cursor-pointer"
           >
-            <span class="text-lg">ادامه جهت تسویه حساب</span>
             <ArrowRightIcon />
+            <span class="text-lg">ادامه جهت تسویه حساب</span>
           </button>
-
           <div class="mt-8 space-y-4">
             <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-xl">
               <ShieldIcon />
@@ -151,27 +208,13 @@ export default component$<CartSummaryProps>(({
           </div>
           <div>
             <p class="font-bold text-gray-900">نکات مهم:</p>
-            <ul class="mt-2 space-y-2 text-sm text-gray-600">
-              <li class="flex items-start gap-2">
-                <CheckIcon />
-                <span>پشتیبانی ۲۴ ساعته در خدمت شماست</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <CheckIcon />
-                <span>حمل و نقل رایگان برای سفارش‌های بالای ۱۰ میلیون تومان</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <CheckIcon />
-                <span>سایر سفارش‌ها: هزینه حمل به صورت جداگانه (پس کرایه) محاسبه می‌شود</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <CheckIcon />
-                <span>ارسال سریع در تهران (۲۴ ساعت) و سایر شهرها (۴۸-۷۲ ساعت)</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <CheckIcon />
-                <span>هزینه دقیق حمل پس از ثبت سفارش توسط پشتیبانی اعلام می‌گردد</span>
-              </li>
+            <ul class="mt-2 space-y-2 text-sm text-gray-600 text-justify ">
+              {check.map((check) => (
+                <li key={check.id} class="flex items-start gap-2 ">
+                  <CheckIcon />
+                  <span>{check.text}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

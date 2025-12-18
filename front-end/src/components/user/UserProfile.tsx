@@ -10,9 +10,9 @@ import OrderCard from "../UserProfile/OrderCard";
 import EditProfileModal from "../UserProfile/EditProfileModal";
 import LoadingSpinner from "../UserProfile/LoadingSpinner";
 import EmptyOrdersState from "../UserProfile/EmptyOrdersState";
+import CheckoutPreview from "../UserProfile/CheckoutPreview";
 
 export default component$(() => {
-    console.log('UserProfile rendering...');
 
     const state = useStore<{
         user: User | null;
@@ -41,12 +41,16 @@ export default component$(() => {
     });
 
     const showEditModal = useSignal(false);
+    const hasCheckout = useSignal(false);
     const editLoading = useSignal(false);
     const editError = useSignal('');
     const onClose$ = $(() => {
         showEditModal.value = false;
     });
-
+    useVisibleTask$(() => {
+        const checkout = localStorage.getItem('perebar_checkout');
+        hasCheckout.value = !!checkout;
+    });
     useVisibleTask$(async () => {
         console.log('Fetching user data...');
         try {
@@ -155,38 +159,6 @@ export default component$(() => {
             editLoading.value = false;
         }
     });
-    const saveProfile = $(async (name: string, address: string) => {
-        if (!state.user) return;
-
-        editLoading.value = true;
-        editError.value = '';
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/user/me/update`, {
-                method: "PUT",
-                headers: { 'Content-Type': 'application/json' },
-                credentials: "include",
-                body: JSON.stringify({
-                    name: name.trim(),
-                    address: address.trim()
-                })
-            });
-
-            const data = await res.json();
-
-            if (data.success && state.user) {
-                state.user.name = name.trim();
-                state.user.address = address.trim();
-                showEditModal.value = false;
-            } else {
-                editError.value = data.message || 'خطا در بروزرسانی پروفایل';
-            }
-        } catch (err) {
-            editError.value = "خطا در ارتباط با سرور";
-        } finally {
-            editLoading.value = false;
-        }
-    });
 
     if (state.loading) {
         return <LoadingSpinner message="در حال بارگذاری پنل کاربری" />;
@@ -216,7 +188,7 @@ export default component$(() => {
     const activeOrders = state.orders.filter(order =>
         order.status === 'pending' || order.status === 'shipped'
     );
-
+    const hasActiveOrders = activeOrders.length > 0;
     return (
         <div class="min-h-screen bg-linear-to-br from-green-50 to-emerald-50">
             <UserProfileHeader user={state.user} onLogout={logout} />
@@ -277,7 +249,7 @@ export default component$(() => {
                                             <h4 class="font-bold text-gray-900 mb-4">
                                                 سفارشات در حال انجام
                                             </h4>
-                                            {activeOrders.length === 0 ? (
+                                            {!hasActiveOrders && !hasCheckout.value ? (
                                                 <EmptyOrdersState
                                                     icon="📦"
                                                     title="هیچ سفارش فعالی ندارید"
@@ -287,9 +259,14 @@ export default component$(() => {
                                                 />
                                             ) : (
                                                 <div class="space-y-4">
-                                                    {activeOrders.map((order) => (
-                                                        <OrderCard key={order._id} order={order} />
-                                                    ))}
+                                                    {/* اگر checkout داریم */}
+                                                    {hasCheckout.value && <CheckoutPreview />}
+
+                                                    {/* اگر سفارش فعال از سرور داریم */}
+                                                    {hasActiveOrders &&
+                                                        activeOrders.map((order) => (
+                                                            <OrderCard key={order._id} order={order} />
+                                                        ))}
                                                 </div>
                                             )}
                                         </div>
