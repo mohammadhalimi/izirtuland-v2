@@ -110,11 +110,61 @@ export default component$(() => {
         }
     });
 
-    const handleCheckout = $(() => {
-        console.log('Redirecting to payment gateway...');
+    const itemsToSend = state.items.map(item => ({
+        product: item.id,        // id محصول از state
+        quantity: item.quantity,
+        price: item.price,
+        packageSize: item.packageSize,
+    }));
 
-        // استفاده از نوتیفیکیشن
-        showNotification('info', 'درگاه پرداخت به زودی فعال خواهد شد', 'توجه');
+    const handleCheckout = $(async () => {
+        try {
+            // 1️⃣ ساخت سفارش
+            const orderRes = await fetch(`${API_BASE_URL}/api/orders`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    items: itemsToSend,
+                    totalPrice: state.total,
+                }),
+            });
+
+            const orderData = await orderRes.json();
+            console.log(orderData)
+            if (!orderRes.ok) {
+                showNotification("error", orderData.message || "خطا در ثبت سفارش", "خطا");
+                return;
+            }
+
+            // 2️⃣ شروع پرداخت
+            const payRes = await fetch(`${API_BASE_URL}/api/payment/start`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    orderId: orderData.orderId,
+                }),
+            });
+
+            const payData = await payRes.json();
+
+            if (!payRes.ok) {
+                showNotification("error", "خطا در اتصال به درگاه پرداخت", "خطا");
+                return;
+            }
+
+            // 3️⃣ ریدایرکت به زیبال
+            window.location.href = payData.paymentUrl;
+
+        } catch (err) {
+            console.error(err);
+            showNotification("error", "خطا در ارتباط با سرور", "خطا");
+        }
     });
 
     const handleContinueShopping = $(() => {

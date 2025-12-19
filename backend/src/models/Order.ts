@@ -1,23 +1,31 @@
 import { Schema, model, Types, Document } from "mongoose";
 
-export interface IOrder extends Document {
-  user: Types.ObjectId;  
+export interface IOrder {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
   items: {
-    product: Types.ObjectId;   // رفرنس به محصول
-    quantity: number;          // تعداد
-    price: number;             // قیمت در زمان سفارش
-    packageSize: string;       // ابعاد انتخاب‌شده محصول
+    product: Types.ObjectId;
+    quantity: number;
+    price: number;
+    packageSize: string;
   }[];
   totalPrice: number;
-  address?: string;
   phone: string;
+  address?: string;
   name?: string;
+  payment: {
+    trackId?: number;
+    paidAt?: Date;
+  };
+
+  status: "pending" | "paid" | "failed";
+
+
   createdAt: Date;
 }
 
 const orderSchema = new Schema<IOrder>({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
   items: [
     {
       product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
@@ -28,11 +36,21 @@ const orderSchema = new Schema<IOrder>({
   ],
 
   totalPrice: { type: Number, required: true },
+  payment: {
+    trackId: { type: Number },
+    paidAt: { type: Date },
+  },
+  status: {
+    type: String,
+    enum: ["pending", "paid", "failed"],
+    default: "pending",
+  },
 
-  // اطلاعات دریافت‌شده از کاربر
-  address: { type: String },
+
+
+  address: String,
   phone: { type: String, required: true },
-  name: { type: String },
+  name: String,
 
   createdAt: { type: Date, default: Date.now },
 });

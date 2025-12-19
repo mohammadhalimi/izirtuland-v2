@@ -9,6 +9,8 @@ import productRotes from "./routes/productRotes"
 import cookieParser from "cookie-parser";
 import authUserRoutes from "./routes/authUserRoutes";
 import userRoutes from "./routes/userRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
+import orderRoutes from "./routes/orderRoutes";
 
 dotenv.config();
 const app = express();
@@ -43,6 +45,10 @@ app.use("/api/product", productRotes);
 
 app.use("/api/auth", authUserRoutes);
 app.use("/api/user", userRoutes);
+
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+
 // connect DB
 connectDB();
 

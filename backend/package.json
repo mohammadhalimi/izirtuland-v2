@@ -10,7 +10,8 @@
     "jsonwebtoken": "^9.0.2",
     "kavenegar": "^1.1.4",
     "mongoose": "^8.19.3",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "zibal": "^1.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
