@@ -10,7 +10,7 @@ interface OrderItemCardProps {
 export default component$<OrderItemCardProps>(({ item, index }) => {
   return (
     <div key={index} class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-      <div class="flex items-center space-x-3 rtl:space-x-reverse">
+      <div class="flex items-center space-x-3">
         <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center border border-green-100">
           <span class="text-gray-600">🌿</span>
         </div>

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { User } from "../models/User";
 import { AuthRequest } from "../middlewares/authUser";
 import { Order } from "../models/Order";
-import { assert } from "console";
 
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -26,7 +25,9 @@ export const getMyOrders = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ success: false, message: "توکن نامعتبر" });
     }
 
-    const orders = await Order.find({ user: req.user.id }).lean();
+    const orders = await Order.find({ user: req.user.id })
+      .populate('items.product', 'name packageSize')
+      .sort({ createdAt: -1 });
 
     return res.json({
       success: true,
@@ -44,13 +45,13 @@ export const getMyOrders = async (req: AuthRequest, res: Response) => {
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.user) 
+    if (!req.user)
       return res.status(401).json({ success: false, message: "توکن نامعتبر" });
 
     const { name, address } = req.body;
 
     const user = await User.findById(req.user.id);
-    if (!user) 
+    if (!user)
       return res.status(404).json({ success: false, message: "کاربر یافت نشد" });
 
     // ویرایش اطلاعات
@@ -59,10 +60,10 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     await user.save();
 
-    return res.json({ 
-      success: true, 
-      message: "پروفایل با موفقیت بروزرسانی شد", 
-      user 
+    return res.json({
+      success: true,
+      message: "پروفایل با موفقیت بروزرسانی شد",
+      user
     });
 
   } catch (error: any) {
@@ -81,11 +82,11 @@ export const logout = (req: Request, res: Response) => {
   return res.json({ success: true, message: "Logged out" });
 };
 
-export const getAllUsers = async (req: Request ,  res: Response) => {
-  try{
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
     const user = await User.find();
-     res.status(200).json(user);
-  } catch(error){
-     res.status(500).json({ message: (error as Error).message });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
   }
 }

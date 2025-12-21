@@ -15,7 +15,11 @@ export interface Product {
 }
 
 export interface OrderItem {
-  product: Product;
+  product: {
+    _id: string;
+    name: string;
+    packageSize: string;
+  };
   quantity: number;
   price: number;
 }
@@ -25,8 +29,11 @@ export interface Order {
   items: OrderItem[];
   totalPrice: number;
   createdAt: string;
-  status: 'pending' | 'completed' | 'cancelled' | 'shipped';
+  status: 'iscompleted' | 'paid' | 'failed';
   orderNumber: string;
+  name:string;
+  address:string;
+  phone:string;
 }
 
 export interface UserStats {
@@ -35,3 +42,24 @@ export interface UserStats {
   completedOrders: number;
   totalSpent: number;
 }
+export interface Notification {
+    id: number;
+    type: 'success' | 'error' | 'info' | 'warning' | 'confirm';
+    message: string;
+    title: string;
+    onConfirm?: () => void;
+    onCancel?: () => void;
+}
+
+export interface CheckoutItem {
+    address: any;
+    id: string;
+    name: string;
+    brand: string;
+    model: string;
+    image: string;
+    packageSize: string;
+    price: number;
+    quantity: number;
+}
+

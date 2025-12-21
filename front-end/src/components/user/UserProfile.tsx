@@ -13,13 +13,12 @@ import EmptyOrdersState from "../UserProfile/EmptyOrdersState";
 import CheckoutPreview from "../UserProfile/CheckoutPreview";
 
 export default component$(() => {
-
     const state = useStore<{
         user: User | null;
         orders: Order[];
         loading: boolean;
         error: string | null;
-        activeTab: 'complete-purchase' | 'completed-orders';
+        activeTab: 'complete-purchase' | 'pending-orders' | 'completed-orders';
         stats: {
             totalOrders: number;
             pendingOrders: number;
@@ -44,13 +43,16 @@ export default component$(() => {
     const hasCheckout = useSignal(false);
     const editLoading = useSignal(false);
     const editError = useSignal('');
+    
     const onClose$ = $(() => {
         showEditModal.value = false;
     });
+    
     useVisibleTask$(() => {
         const checkout = localStorage.getItem('perebar_checkout');
         hasCheckout.value = !!checkout;
     });
+    
     useVisibleTask$(async () => {
         console.log('Fetching user data...');
         try {
@@ -77,22 +79,23 @@ export default component$(() => {
                 return;
             }
 
-            // این بخش مهم: محاسبه stats
             if (ordersData.success) {
                 state.orders = ordersData.orders;
 
-                // محاسبه stats
-                const completedOrders = ordersData.orders.filter((order: Order) => order.status === 'completed');
+                const completedOrders = ordersData.orders.filter((order: Order) => order.status === 'iscompleted');
+                const pendingOrders = ordersData.orders.filter((order: Order) => 
+                    order.status === 'paid'
+                );
+                
                 state.stats = {
                     totalOrders: ordersData.orders.length,
-                    pendingOrders: ordersData.orders.filter((order: Order) => order.status === 'pending').length,
+                    pendingOrders: pendingOrders.length,
                     completedOrders: completedOrders.length,
                     totalSpent: completedOrders.reduce((sum: number, order: Order) => sum + order.totalPrice, 0)
                 };
 
                 console.log('Calculated stats:', state.stats);
             } else {
-                // اگر سفارشی نداشت یا خطا
                 state.orders = [];
                 state.stats = {
                     totalOrders: 0,
@@ -124,9 +127,10 @@ export default component$(() => {
         }
     });
 
-    const handleTabChange = $((tab: 'complete-purchase' | 'completed-orders') => {
+    const handleTabChange = $((tab: 'complete-purchase' | 'pending-orders' | 'completed-orders') => {
         state.activeTab = tab;
     });
+    
     const onSave$ = $(async (name: string, address: string) => {
         if (!state.user) return;
 
@@ -184,11 +188,13 @@ export default component$(() => {
         return null;
     }
 
-    const completedOrders = state.orders.filter(order => order.status === 'completed');
-    const activeOrders = state.orders.filter(order =>
-        order.status === 'pending' || order.status === 'shipped'
+    // فیلتر کردن سفارشات بر اساس وضعیت
+    const completedOrders = state.orders.filter(order => order.status === 'iscompleted');
+    const pendingOrders = state.orders.filter(order => 
+        order.status === 'paid'
     );
-    const hasActiveOrders = activeOrders.length > 0;
+    const hasPendingOrders = pendingOrders.length > 0;
+
     return (
         <div class="min-h-screen bg-linear-to-br from-green-50 to-emerald-50">
             <UserProfileHeader user={state.user} onLogout={logout} />
@@ -206,7 +212,7 @@ export default component$(() => {
                         title="در انتظار"
                         value={state.stats.pendingOrders}
                         icon="⏳"
-                        color="yellow"
+                        color="blue"
                     />
                     <UserStatsCard
                         title="تکمیل شده"
@@ -249,24 +255,42 @@ export default component$(() => {
                                             <h4 class="font-bold text-gray-900 mb-4">
                                                 سفارشات در حال انجام
                                             </h4>
-                                            {!hasActiveOrders && !hasCheckout.value ? (
+                                            {!hasCheckout.value ? (
                                                 <EmptyOrdersState
-                                                    icon="📦"
-                                                    title="هیچ سفارش فعالی ندارید"
+                                                    icon="🛒"
+                                                    title="هیچ سبد خریدی در انتظار ندارید"
                                                     subtitle="می‌توانید از بخش محصولات، کالاهای مورد نیاز خود را انتخاب کنید"
                                                     buttonText="مشاهده محصولات"
                                                     buttonHref="/Products"
                                                 />
                                             ) : (
+                                                <CheckoutPreview />
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : state.activeTab === 'pending-orders' ? (
+                                    <div class="space-y-6">
+                                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                                            سفارشات در حال انتظار
+                                        </h3>
+                                        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                                            {!hasPendingOrders ? (
+                                                <EmptyOrdersState
+                                                    icon="⏳"
+                                                    title="هیچ سفارش در حال انتظاری ندارید"
+                                                    subtitle="سفارشات شما پس از ثبت در این بخش نمایش داده می‌شوند"
+                                                    buttonText="شروع خرید جدید"
+                                                    onButtonClick$={() => state.activeTab = 'complete-purchase'}
+                                                />
+                                            ) : (
                                                 <div class="space-y-4">
-                                                    {/* اگر checkout داریم */}
-                                                    {hasCheckout.value && <CheckoutPreview />}
-
-                                                    {/* اگر سفارش فعال از سرور داریم */}
-                                                    {hasActiveOrders &&
-                                                        activeOrders.map((order) => (
-                                                            <OrderCard key={order._id} order={order} />
-                                                        ))}
+                                                    {pendingOrders.map((order) => (
+                                                        <OrderCard 
+                                                            key={order._id} 
+                                                            order={order} 
+                                                            showStatus={true}
+                                                        />
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>
@@ -287,7 +311,11 @@ export default component$(() => {
                                         ) : (
                                             <div class="space-y-4">
                                                 {completedOrders.map((order) => (
-                                                    <OrderCard key={order._id} order={order} isCompleted={true} />
+                                                    <OrderCard 
+                                                        key={order._id} 
+                                                        order={order} 
+                                                        isCompleted={true}
+                                                    />
                                                 ))}
                                             </div>
                                         )}

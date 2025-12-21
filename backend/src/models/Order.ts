@@ -18,7 +18,7 @@ export interface IOrder {
     paidAt?: Date;
   };
 
-  status: "pending" | "paid" | "failed";
+  status: "iscompleted" | "paid" | "pending";
 
 
   createdAt: Date;
@@ -42,7 +42,7 @@ const orderSchema = new Schema<IOrder>({
   },
   status: {
     type: String,
-    enum: ["pending", "paid", "failed"],
+    enum: ["iscompleted", "paid", "pending"],
     default: "pending",
   },
 

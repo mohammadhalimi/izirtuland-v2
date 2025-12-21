@@ -112,7 +112,7 @@ export default component$(() => {
 
   if (state.isLoading) {
     return (
-      <div class="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center p-4">
+      <div class="min-h-screen bg-linear-to-b from-green-50 to-white flex items-center justify-center p-4">
         <div class="text-center">
           <div class="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p class="text-gray-600">در حال بارگذاری اطلاعات پرداخت...</p>
@@ -124,7 +124,7 @@ export default component$(() => {
 
   if (state.error) {
     return (
-      <div class="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center p-4">
+      <div class="min-h-screen bg-linear-to-b from-red-50 to-white flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export default component$(() => {
   }
 
   return (
-    <div class="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center p-4">
+    <div class="min-h-screen bg-linear-to-b from-green-50 to-white flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
         <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

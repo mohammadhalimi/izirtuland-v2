@@ -2,26 +2,8 @@ import { $, component$, useStore, useVisibleTask$, useSignal } from '@builder.io
 import { useNavigate } from '@builder.io/qwik-city';
 import { API_BASE_URL } from '~/config/api';
 import EmptyOrdersState from '../UserProfile/EmptyOrdersState';
-
-interface CheckoutItem {
-    id: string;
-    name: string;
-    brand: string;
-    model: string;
-    image: string;
-    packageSize: string;
-    price: number;
-    quantity: number;
-}
-
-interface Notification {
-    id: number;
-    type: 'success' | 'error' | 'info' | 'warning' | 'confirm';
-    message: string;
-    title: string;
-    onConfirm?: () => void;
-    onCancel?: () => void;
-}
+import type { CheckoutItem } from '../types/user';
+import type { Notification } from '../types/user';
 
 export default component$(() => {
     const nav = useNavigate();
@@ -115,6 +97,8 @@ export default component$(() => {
         quantity: item.quantity,
         price: item.price,
         packageSize: item.packageSize,
+        name:item.name,
+        address:item.address
     }));
 
     const handleCheckout = $(async () => {
