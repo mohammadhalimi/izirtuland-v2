@@ -128,24 +128,6 @@ export default component$(() => {
             </div>
           </div>
         </div>
-
-        {/* CTA کوچک */}
-        <div class="mt-12 text-center">
-          <div class="bg-linear-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white">
-            <h3 class="text-2xl font-bold mb-4">آماده شروع همکاری هستید؟</h3>
-            <p class="text-green-100 mb-6 max-w-2xl mx-auto">
-              همین حالا با کارشناسان ما تماس بگیرید و از مشاوره رایگان بهره‌مند شوید
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <button class="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover-lift">
-                📞 تماس با کارشناس
-              </button>
-              <button class="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover-lift">
-                💬 گفتگوی آنلاین
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

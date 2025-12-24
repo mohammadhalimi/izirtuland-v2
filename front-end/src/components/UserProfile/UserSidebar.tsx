@@ -7,7 +7,9 @@ interface UserSidebarProps {
   showEditModal: { value: boolean };
 }
 
+
 export default component$<UserSidebarProps>(({ user, showEditModal }) => {
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fa-IR');
   };
