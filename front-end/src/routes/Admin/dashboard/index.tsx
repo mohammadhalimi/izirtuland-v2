@@ -210,7 +210,7 @@ export default component$(() => {
         <main class="flex-1 overflow-auto p-6">
           {/* رندر شرطی کامپوننت‌ها */}
           {activeTab.value === 'dashboard' && <Dashboard adminName={authData.value.admin.username} authToken={authData.value.token}/>}
-          {activeTab.value === 'orders' && <Orders />}
+          {activeTab.value === 'orders' && <Orders authToken={authData.value.token} />}
           {activeTab.value === 'posts' && <Posts authToken={authData.value.token} />}
           {activeTab.value === 'CreateAdmin' && <CreateAdmin authToken={authData.value.token} currentAdmin={authData.value.admin} />}
           {activeTab.value === 'EditProfile' && <EditProfile authToken={authData.value.token} currentAdmin={authData.value.admin} />}

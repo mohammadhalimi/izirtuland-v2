@@ -6,6 +6,7 @@ import { uploadProfileImage } from "../controllers/profileController";
 import { upload } from "../middlewares/upload";
 import { getAllUsers } from "../controllers/userController";
 
+
 const router = express.Router();
 
 // فقط سوپر ادمین می‌تواند ادمین جدید بسازد
@@ -38,5 +39,8 @@ router.put(
   upload.single("profile"),
   uploadProfileImage
 );
+
+
+
 
 export default router;
