@@ -22,7 +22,6 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     // ✅ اینجاست که کد تو باید باشه
     const order = await Order.create({
       user: user._id,
@@ -32,6 +31,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       name: user.name,
       address: user.address,
     });
+    console.log("items.brand--------------------", items);
 
     return res.status(201).json({
       orderId: order._id,

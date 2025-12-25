@@ -1,9 +1,8 @@
 import { Router } from "express";
 import { createOrder } from "../controllers/orderController";
-import { verifyToken, isAdmin } from "../middlewares/authMiddleware";
-
+import { verifyToken } from "../middlewares/authUser";
 const router = Router();
 
-router.post("/", verifyToken,isAdmin, createOrder);
+router.post("/",verifyToken, createOrder);
 
 export default router;

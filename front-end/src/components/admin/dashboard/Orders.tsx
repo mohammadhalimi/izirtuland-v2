@@ -40,7 +40,7 @@ export default component$<OrdersProps>(({ authToken }) => {
           <p class="text-red-600">{err.message}</p>
         )}
         onResolved={(orders) => (
-          <OrdersTable orders={orders} />
+          <OrdersTable orders={orders} authToken={authToken}/>
         )}
       />
     </div>

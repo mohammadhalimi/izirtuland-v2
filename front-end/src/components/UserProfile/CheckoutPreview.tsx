@@ -98,7 +98,8 @@ export default component$(() => {
         price: item.price,
         packageSize: item.packageSize,
         name:item.name,
-        address:item.address
+        address:item.address,
+        brand:item.brand
     }));
 
     const handleCheckout = $(async () => {

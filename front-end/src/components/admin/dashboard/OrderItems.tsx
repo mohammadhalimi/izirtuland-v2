@@ -8,6 +8,7 @@ export const OrderItems = component$<{ items: OrderItem[] }>(({ items }) => {
         <div key={i} class="flex justify-between text-sm">
           <div>
             {item.product.name}
+            {item.product.brand}
             <span class="text-xs text-gray-500">
               {" "}
               ({item.product.packageSize})

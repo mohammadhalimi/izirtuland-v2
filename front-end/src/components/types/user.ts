@@ -22,6 +22,9 @@ export interface OrderItem {
   };
   quantity: number;
   price: number;
+  brand?: string;
+  name?: string;
+  packageSize?: string;
 }
 
 export interface Order {

@@ -1,4 +1,4 @@
-import { Schema, model, Types, Document } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 export interface IOrder {
   _id: Types.ObjectId;
@@ -32,6 +32,7 @@ const orderSchema = new Schema<IOrder>({
       quantity: { type: Number, required: true },
       price: { type: Number, required: true },
       packageSize: { type: String, required: true },
+      brand: { type: String, required: true }
     },
   ],
 
