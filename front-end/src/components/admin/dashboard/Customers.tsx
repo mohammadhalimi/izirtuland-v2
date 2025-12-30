@@ -1,19 +1,7 @@
 // src/components/admin/dashboard/CustomerManager.tsx
 import { component$, useStore, useVisibleTask$, $ } from '@builder.io/qwik';
 import { API_BASE_URL } from '~/config/api';
-
-interface Customer {
-  _id: string;
-  phone: string;
-  name?: string;
-  address?: string;
-  createdAt: string;
-  __v?: number;
-}
-
-interface CustomerManagerProps {
-  authToken: string;
-}
+import type { Customer, CustomerManagerProps } from '~/components/types/customer';
 
 export default component$<CustomerManagerProps>(({ authToken }) => {
   const state = useStore({

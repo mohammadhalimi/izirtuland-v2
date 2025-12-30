@@ -1,13 +1,6 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import { useLocation, Link } from '@builder.io/qwik-city';
-
-interface PaymentData {
-  orderId: string;
-  trackId: string;
-  amount: number;
-  refNumber?: string;
-  paidAt?: string;
-}
+import type { PaymentData } from '~/components/types/payemnt';
 
 export default component$(() => {
   const loc = useLocation();
@@ -24,10 +17,6 @@ export default component$(() => {
 
   useVisibleTask$(async () => {
     try {
-      console.log('🔍 Full URL:', loc.url.href);
-      console.log('🔍 URL Search:', loc.url.search);
-      console.log('🔍 URL Pathname:', loc.url.pathname);
-      
       // استخراج پارامترها از URL
       // روش 1: از searchParams استفاده کنیم
       const params = new URLSearchParams(loc.url.search);
@@ -35,44 +24,21 @@ export default component$(() => {
       // روش 2: همچنین می‌توانیم از object URL استفاده کنیم
       const url = new URL(loc.url.href);
       const searchParams = url.searchParams;
-      
-      console.log('📊 All URL parameters:');
-      for (const [key, value] of searchParams.entries()) {
-        console.log(`  ${key}: ${value}`);
-      }
-      
       const orderId = params.get('orderId') || searchParams.get('orderId');
       const trackId = params.get('trackId') || searchParams.get('trackId');
-      const amount = params.get('amount') || searchParams.get('amount');
-      const refNumber = params.get('refNumber') || searchParams.get('refNumber');
-
-      console.log('✅ Extracted values:', {
-        orderId,
-        trackId,
-        amount,
-        refNumber,
-        hasOrderId: !!orderId,
-        hasTrackId: !!trackId
-      });
+      const refNumber = params.get('refNumber') || searchParams.get('refNumber')
 
       if (!orderId || !trackId) {
         state.error = 'اطلاعات پرداخت ناقص است';
-        console.error('❌ Missing orderId or trackId');
         return;
       }
-
-      // مقدار amount ممکن است نباشد، می‌توانیم مقدار پیش‌فرض بگذاریم
-      const amountValue = amount ? parseInt(amount) : 0;
 
       state.paymentData = {
         orderId,
         trackId,
-        amount: amountValue,
         refNumber: refNumber || undefined,
         paidAt: new Date().toISOString()
       };
-
-      console.log('💰 Payment data set:', state.paymentData);
 
       // پاک کردن سبد خرید
       localStorage.removeItem('perebar_checkout');
@@ -85,19 +51,16 @@ export default component$(() => {
           _id: orderId,
           orderNumber: orderId,
           items: JSON.parse(localStorage.getItem('last_order_items') || '[]'),
-          totalPrice: amountValue,
           status: 'completed',
           createdAt: new Date().toISOString(),
           completedAt: new Date().toISOString(),
           payment: {
             trackId,
-            amount: amountValue,
             paidAt: new Date().toISOString(),
             refNumber: refNumber || undefined
           }
         });
         localStorage.setItem('user_orders', JSON.stringify(existingOrders));
-        console.log('💾 Order saved to localStorage');
       } catch (storageError) {
         console.error('Storage error:', storageError);
       }
@@ -178,11 +141,6 @@ export default component$(() => {
             </div>
             <div class="flex justify-between items-center">
               <span class="text-gray-600">مبلغ پرداختی:</span>
-              <span class="font-bold text-green-700">
-                {state.paymentData?.amount 
-                  ? state.paymentData.amount.toLocaleString('fa-IR') 
-                  : 'نامشخص'} تومان
-              </span>
             </div>
             {state.paymentData?.refNumber && (
               <div class="flex justify-between items-center">
@@ -195,7 +153,7 @@ export default component$(() => {
         
         <div class="space-y-3">
           <Link
-            href="/user"
+            href="/User"
             class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md hover:shadow-lg"
           >
             مشاهده سفارش‌های من

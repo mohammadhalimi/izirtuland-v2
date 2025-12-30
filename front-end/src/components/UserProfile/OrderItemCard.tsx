@@ -18,22 +18,7 @@ const formatPackageSize = (packageSize: string) => {
   return sizeMap[packageSize] || packageSize;
 };
 
-const getCategoryIcon = (category: string) => {
-  switch (category?.toLowerCase()) {
-    case 'شیمیایی':
-      return '🧪';
-    case 'ارگانیک':
-      return '🌿';
-    case 'سموم':
-      return '🐛';
-    case 'تجهیزات':
-      return '🔧';
-    default:
-      return '📦';
-  }
-};
-
-export default component$<OrderItemCardProps>(({ item, index }) => {
+export default component$<OrderItemCardProps>(({ item }) => {
   const totalPrice = item.quantity * item.price;
 
   return (

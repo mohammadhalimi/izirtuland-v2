@@ -33,7 +33,7 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
           <div>
             <div class="flex items-center gap-3 mb-2">
               <h3 class="font-bold text-lg text-gray-900">
-                سفارش #{order.orderNumber || order._id.slice(-6)}
+                کد رهگیری #{order.payment.trackId || order._id.slice(-6)}
               </h3>
               {/* Status Badge */}
               {showStatus && (

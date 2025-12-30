@@ -12,6 +12,10 @@ export interface Product {
   name: string;
   packageSize: string;
   image?: string;
+  payment: {
+    trackId: string;
+    paidAt: string;
+  }
 }
 
 export interface OrderItem {
@@ -25,6 +29,7 @@ export interface OrderItem {
   brand?: string;
   name?: string;
   packageSize?: string;
+
 }
 
 export interface Order {
@@ -33,10 +38,13 @@ export interface Order {
   totalPrice: number;
   createdAt: string;
   status: 'iscompleted' | 'paid' | 'failed';
-  orderNumber: string;
-  name:string;
-  address:string;
-  phone:string;
+  payment: {
+    trackId: string;
+    paidAt: string;
+  }  
+  name: string;
+  address: string;
+  phone: string;
 }
 
 export interface UserStats {
@@ -46,23 +54,23 @@ export interface UserStats {
   totalSpent: number;
 }
 export interface Notification {
-    id: number;
-    type: 'success' | 'error' | 'info' | 'warning' | 'confirm';
-    message: string;
-    title: string;
-    onConfirm?: () => void;
-    onCancel?: () => void;
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning' | 'confirm';
+  message: string;
+  title: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
 }
 
 export interface CheckoutItem {
-    address: any;
-    id: string;
-    name: string;
-    brand: string;
-    model: string;
-    image: string;
-    packageSize: string;
-    price: number;
-    quantity: number;
+  address: any;
+  id: string;
+  name: string;
+  brand: string;
+  model: string;
+  image: string;
+  packageSize: string;
+  price: number;
+  quantity: number;
 }
 
