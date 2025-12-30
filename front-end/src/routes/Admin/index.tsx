@@ -1,6 +1,6 @@
 // src/routes/admin/login/index.tsx
 import { component$, useSignal } from '@builder.io/qwik';
-import { routeAction$, zod$ } from '@builder.io/qwik-city';
+import { DocumentHead, routeAction$, zod$ } from '@builder.io/qwik-city';
 import { loginSchema } from '../../components/schemas/auth';
 import { AuthService } from '../../components/service/auth-service';
 import { AUTH_CONSTANTS } from '~/components/constants/auth';
@@ -10,22 +10,16 @@ import { LoginHeader } from '../../components/loginAdmin/login-header';
 import { LoginLayout } from '../../components/loginAdmin/login-layout'
 import { LoginCard } from '../../components/loginAdmin/login-card'
 import { LoginForm } from '../../components/loginAdmin/login-form'
-import { DemoCredentials } from '../../components/loginAdmin/demo-credentials'
 import { SecurityNotice } from '../../components/loginAdmin/security-notice'
 
 export const useLoginAction = routeAction$(
   async (formData: LoginFormData, requestEvent): Promise<LoginSuccessResponse | LoginErrorResponse> => {
     try {
       const result = await AuthService.login(formData);
-      
+
       setAuthCookies(requestEvent, result, formData.rememberMe);
       redirectToDashboard(requestEvent);
-      
-      return {
-        success: true,
-        message: 'لاگین موفقیت‌آمیز بود'
-      };
-      
+
     } catch (error) {
       if (isRedirectError(error)) {
         throw error;
@@ -37,12 +31,12 @@ export const useLoginAction = routeAction$(
 );
 
 function setAuthCookies(
-  requestEvent: any, 
-  result: any, 
+  requestEvent: any,
+  result: any,
   rememberMe?: boolean
 ): void {
-  const maxAge = rememberMe 
-    ? AUTH_CONSTANTS.COOKIE.MAX_AGE.REMEMBER_ME 
+  const maxAge = rememberMe
+    ? AUTH_CONSTANTS.COOKIE.MAX_AGE.REMEMBER_ME
     : AUTH_CONSTANTS.COOKIE.MAX_AGE.STANDARD;
 
   requestEvent.cookie.set('auth-token', result.token, {
@@ -69,8 +63,8 @@ function isRedirectError(error: unknown): boolean {
 }
 
 function handleLoginError(error: unknown): LoginErrorResponse {
-  const errorMessage = error instanceof Error 
-    ? error.message 
+  const errorMessage = error instanceof Error
+    ? error.message
     : 'خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.';
 
   return {
@@ -87,13 +81,16 @@ export default component$(() => {
     <LoginLayout>
       <LoginCard>
         <LoginHeader />
-        <LoginForm 
+        <LoginForm
           action={loginAction}
           showPassword={showPassword}
         />
-        <DemoCredentials />
         <SecurityNotice />
       </LoginCard>
     </LoginLayout>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'صفحه ورود مدیریت',
+};

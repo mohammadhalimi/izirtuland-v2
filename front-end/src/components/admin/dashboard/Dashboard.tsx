@@ -1,22 +1,8 @@
 import { $, component$, useSignal, useTask$ } from '@builder.io/qwik';
 import { API_BASE_URL } from '~/config/api';
 import type { Product } from '~/components/types/product';
-
-interface User {
-    _id: string;
-    phone: string;
-    username?: string;
-    name?: string;
-    email?: string;
-    address?: string;
-    role: string;
-    createdAt: string;
-}
-
-interface DashboardProps {
-    adminName: string;
-    authToken: string; // اضافه کردن prop برای توکن
-}
+import { getColorClass } from '~/components/function/function';
+import { DashboardProps, User } from '~/components/types/dashBoard';
 
 export default component$<DashboardProps>(({ adminName, authToken }) => {
     const error = useSignal('');
@@ -30,13 +16,54 @@ export default component$<DashboardProps>(({ adminName, authToken }) => {
         { title: 'محصولات', value: '۰', change: '+۰%', icon: '🌿', color: 'orange' }
     ]);
 
+const fetchOrders = $(async () => {
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+        const text = await response.text();
+        if (!response.ok) {
+            throw new Error(text || 'response not ok');
+        }
+
+        const data = JSON.parse(text);
+
+        // 👇 اینجا بعداً اصلاح می‌کنیم اگر ساختار فرق داشت
+        const orders = Array.isArray(data) ? data : data.orders;
+
+        const totalOrders = orders.length;
+        const totalSales = orders.reduce(
+            (sum: number, o: any) => sum + (o.totalPrice || 0),
+            0
+        );
+
+        stats.value = stats.value.map(stat => {
+            if (stat.title === 'سفارشات') {
+                return { ...stat, value: totalOrders.toString(), change: '+۰%' };
+            }
+            if (stat.title === 'کل فروش') {
+                return { ...stat, value: totalSales.toLocaleString('fa-IR'), change: '+۰%' };
+            }
+            return stat;
+        });
+
+    } catch (err: any) {
+        error.value = err.message;
+    }
+});
+
     // دریافت محصولات (بدون نیاز به توکن)
     const fetchProducts = $(async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/product`);
             if (response.ok) {
                 const data = await response.json();
-                console.log('📦 Products fetched:', data.length);
                 products.value = data;
 
                 // به‌روزرسانی آمار تعداد محصولات
@@ -115,24 +142,29 @@ export default component$<DashboardProps>(({ adminName, authToken }) => {
     useTask$(async () => {
         loading.value = true;
 
-        // ابتدا محصولات را بگیریم (بدون نیاز به توکن)
         await fetchProducts();
 
-        // اگر توکن داریم، کاربران را هم بگیریم
         if (authToken) {
-            await fetchUsers();
+            await Promise.all([
+                fetchUsers(),
+                fetchOrders()
+            ]);
         }
 
         loading.value = false;
     });
+
 
     // تابع refresh برای رفرش دستی
     const refreshData = $(async () => {
         loading.value = true;
         error.value = '';
 
-        await Promise.all([fetchProducts(), fetchUsers()]);
-        loading.value = false;
+        await Promise.all([
+            fetchProducts(),
+            fetchUsers(),
+            fetchOrders()
+        ]); loading.value = false;
     });
 
     return (
@@ -221,14 +253,3 @@ export default component$<DashboardProps>(({ adminName, authToken }) => {
         </div>
     );
 });
-
-// تابع کمکی برای کلاس‌های رنگ
-const getColorClass = (color: string, type: 'text' | 'bg') => {
-    const colors: Record<string, Record<string, string>> = {
-        green: { text: 'text-green-600', bg: 'bg-green-100' },
-        blue: { text: 'text-blue-600', bg: 'bg-blue-100' },
-        purple: { text: 'text-purple-600', bg: 'bg-purple-100' },
-        orange: { text: 'text-orange-600', bg: 'bg-orange-100' }
-    };
-    return colors[color]?.[type] || colors.green[type];
-};

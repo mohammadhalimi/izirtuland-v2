@@ -1,101 +1,20 @@
 // src/components/layouts/ProductSlider.tsx (فقط کارت محصولات حرفه‌ای‌تر)
 import { component$, $, useSignal, useVisibleTask$, useOnWindow } from '@builder.io/qwik';
-import type { Product } from '~/components/types/product';
-
-// ایمپورت Swiper و ماژول‌های مورد نیاز
 import Swiper from 'swiper';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-
-interface ProductSliderProps {
-  products: Product[];
-  title?: string;
-  apiBaseUrl: string;
-  onAddToCart?: (product: Product) => void;
-}
+import { formatPackageSize, formatPrice, getBrandColors, getFullImageUrl, getModelColors } from '../function/function';
+import { ProductSliderProps } from '../types/slider';
 
 export default component$<ProductSliderProps>(({
   products,
   title = "محصولات مرتبط",
-  apiBaseUrl
 }) => {
   const sliderContainerRef = useSignal<HTMLDivElement>();
   const swiperInstance = useSignal<Swiper | null>(null);
   const hoveredProductId = useSignal<string | null>(null);
-
-  // تابع فرمت قیمت
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
-  };
-
-  // تابع فرمت سایز بسته
-  const formatPackageSize = (packageSize: string) => {
-    const sizeMap: { [key: string]: string } = {
-      '1kg': '۱ کیلوگرم',
-      '10kg': '۱۰ کیلوگرم',
-      '1litre': '۱ لیتر',
-      '5liter': '۵ لیتر',
-      '20litre': '۲۰ لیتر'
-    };
-    return sizeMap[packageSize] || packageSize;
-  };
-
-  // تابع دریافت URL کامل تصویر
-  const getFullImageUrl = (imagePath: string | undefined) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${apiBaseUrl}${imagePath}`;
-  };
-
-  // رنگ برند
-  const getBrandColors = (brand: string) => {
-    if (brand === 'Izirtu Land') {
-      return {
-        gradient: 'from-blue-500 to-sky-600',
-        bg: 'bg-linear-to-r from-blue-500 to-sky-600',
-        light: 'bg-blue-50',
-        text: 'text-blue-800',
-        border: 'border-blue-200'
-      };
-    } else if (brand === 'Khak Shimi') {
-      return {
-        gradient: 'from-amber-500 to-orange-600',
-        bg: 'bg-linear-to-r from-amber-500 to-orange-600',
-        light: 'bg-amber-50',
-        text: 'text-amber-800',
-        border: 'border-amber-200'
-      };
-    }
-    return {
-      gradient: 'from-gray-500 to-gray-700',
-      bg: 'bg-linear-to-r from-gray-500 to-gray-700',
-      light: 'bg-gray-50',
-      text: 'text-gray-800',
-      border: 'border-gray-200'
-    };
-  };
-
-  // رنگ نوع محصول
-  const getModelColors = (model: string) => {
-    return model === 'جامد'
-      ? {
-        gradient: 'from-green-500 to-emerald-600',
-        bg: 'bg-linear-to-r from-green-500 to-emerald-600',
-        light: 'bg-green-50',
-        text: 'text-green-800',
-        border: 'border-green-200'
-      }
-      : {
-        gradient: 'from-purple-500 to-indigo-600',
-        bg: 'bg-linear-to-r from-purple-500 to-indigo-600',
-        light: 'bg-purple-50',
-        text: 'text-purple-800',
-        border: 'border-purple-200'
-      };
-  };
-
   // رفتن به صفحه محصول
   const goToProduct = $((productId: string) => {
     window.location.href = `/Products/${productId}`;

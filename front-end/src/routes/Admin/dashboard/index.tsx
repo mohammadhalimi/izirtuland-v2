@@ -1,8 +1,6 @@
 // src/routes/admin/dashboard/index.tsx
 import { component$, useSignal, $ } from '@builder.io/qwik';
-import { routeLoader$, routeAction$ } from '@builder.io/qwik-city';
-
-// ایمپورت کامپوننت‌ها
+import { routeLoader$, routeAction$, DocumentHead } from '@builder.io/qwik-city';
 import Dashboard from '~/components/admin/dashboard/Dashboard';
 import Orders from '~/components/admin/dashboard/Orders';
 import Customers from '~/components/admin/dashboard/Customers';
@@ -10,17 +8,9 @@ import CreateAdmin from '~/components/admin/dashboard/CreateAdmin';
 import EditProfile from '~/components/admin/dashboard/EditProfile';
 import Posts from '~/components/admin/dashboard/Posts';
 import ProductManager from '~/components/admin/dashboard/ProductManager';
-import { API_BASE_URL } from '~/config/api';
+import { getFullImageUrl, navItems } from '~/components/function/function';
+import { AdminData } from '~/components/types/authAdmin';
 
-// Type برای اطلاعات ادمین
-interface AdminData {
-  _id: string;
-  username: string;
-  role: "admin" | "superadmin";
-  profileImage: string;
-}
-
-// Loader برای چک کردن احراز هویت
 export const useAuthCheck = routeLoader$(({ cookie, redirect }) => {
   const authToken = cookie.get('auth-token')?.value;
   const adminDataCookie = cookie.get('admin-data')?.value;
@@ -56,20 +46,6 @@ export default component$(() => {
   const sidebarOpen = useSignal(false);
   const activeTab = useSignal('dashboard');
   const showLogoutModal = useSignal(false);
-
-  // منوی navigation
-  const navItems = [
-    { id: 'dashboard', label: 'داشبورد', icon: '📊' },
-    { id: 'orders', label: 'سفارشات', icon: '📦' },
-    { id: 'product-manager', label: 'مدیریت محصولات', icon: '🛍️' }, // اضافه شد
-    { id: 'posts', label: 'مدیریت پست‌ها', icon: '📝' },
-    { id: 'CreateAdmin', label: 'ایجاد ادمین', icon: '👨‍💼' },
-    { id: 'EditProfile', label: 'ویرایش پروفایل', icon: '👤' },
-    { id: 'customers', label: 'مشتریان', icon: '👥' },
-    { id: 'analytics', label: 'تحلیل‌ها', icon: '📈' },
-    { id: 'settings', label: 'تنظیمات', icon: '⚙️' }
-  ];
-
   const toggleSidebar = $(() => {
     sidebarOpen.value = !sidebarOpen.value;
   });
@@ -85,12 +61,6 @@ export default component$(() => {
   const cancelLogout = $(() => {
     showLogoutModal.value = false;
   });
-
-  const getFullImageUrl = (imagePath: string | undefined) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${API_BASE_URL}${imagePath}`;
-  };
 
   return (
     <div class="flex h-screen bg-gray-50" dir="rtl">
@@ -257,3 +227,7 @@ export default component$(() => {
     </div>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'پنل مدیریت',
+};

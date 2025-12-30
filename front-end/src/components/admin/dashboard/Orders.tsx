@@ -1,7 +1,7 @@
 // src/components/admin/Orders.tsx
 import { component$, Resource, useResource$, useSignal } from "@builder.io/qwik";
 import type { Order } from "~/components/types/order";
-import { OrdersTable } from "./OrdersTable";
+import { OrdersTable } from "../../dashboard/order/OrdersTable";
 import { API_BASE_URL } from "~/config/api";
 
 interface OrdersProps {

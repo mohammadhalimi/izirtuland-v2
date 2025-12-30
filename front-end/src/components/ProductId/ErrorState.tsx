@@ -1,13 +1,18 @@
 // src/routes/products/[id]/ErrorState.tsx
-import { component$ } from '@builder.io/qwik';
+import { $, component$ } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
+import { error } from 'console';
 
-interface ErrorStateProps {
-    productId: string;
-    error?: string;
+export interface ErrorStateProps {
+    onRetry: () => void;
 }
 
-export const ErrorState = component$<ErrorStateProps>(({ productId, error }) => {
+export const ErrorState = component$<ErrorStateProps>(({ onRetry }) => {
+
+    const handleRetry = $(() => {
+        onRetry();
+    });
+    
     return (
         <div class="text-center py-20 bg-white rounded-2xl shadow-xl p-8 md:p-10 max-w-2xl mx-auto">
             <div class="text-red-500 mb-6">
@@ -27,7 +32,7 @@ export const ErrorState = component$<ErrorStateProps>(({ productId, error }) => 
                     مشاهده همه محصولات
                 </Link>
                 <button
-                    onClick$={() => window.location.reload()}
+                    onClick$={handleRetry}
                     class="inline-block bg-linear-to-r from-gray-600 to-gray-700 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300"
                 >
                     تلاش مجدد

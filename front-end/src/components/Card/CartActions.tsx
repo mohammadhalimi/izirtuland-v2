@@ -1,12 +1,7 @@
 // src/components/cart/CartActions.tsx
 import { component$ } from '@builder.io/qwik';
 import { CheckIcon, TrashIcon } from '~/components/icons';
-
-interface CartActionsProps {
-  uniqueProducts: number;
-  totalUnits: number;
-  onClearCart: () => void;
-}
+import { CartActionsProps } from '../types/card';
 
 export default component$<CartActionsProps>(({ uniqueProducts, totalUnits, onClearCart }) => {
   return (

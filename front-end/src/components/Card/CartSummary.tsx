@@ -1,12 +1,9 @@
 // src/components/cart/CartSummary.tsx
 import { $, component$ } from '@builder.io/qwik';
 import { ArrowRightIcon, ShieldIcon, ReceiptIcon, CheckIcon, TruckIcon } from '~/components/icons';
+import { CartSummaryProps } from '../types/card';
 
-interface CartSummaryProps {
-  totalPrice: number;
-  totalUnits: number;
-  isFreeShipping: boolean;
-}
+
 
 export default component$<CartSummaryProps>(({
   totalPrice,

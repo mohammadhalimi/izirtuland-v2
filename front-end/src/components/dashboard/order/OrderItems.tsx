@@ -1,24 +1,9 @@
 import { component$ } from "@builder.io/qwik";
 import type { OrderItem } from "~/components/types/order";
+import { formatPackageSize, formatPrice } from "~/components/function/function";
 
 export const OrderItems = component$<{ items: OrderItem[] }>(({ items }) => {
-  const formatPackageSize = (packageSize: string) => {
-    if (!packageSize) return '';
-    const sizeMap: { [key: string]: string } = {
-      '1kg': '۱ کیلوگرم',
-      '10kg': '۱۰ کیلوگرم',
-      '1litre': '۱ لیتر',
-      '5liter': '۵ لیتر',
-      '20litre': '۲۰ لیتر',
-      '20liter': '۲۰ لیتر',
-      '5litre': '۵ لیتر',
-    };
-    return sizeMap[packageSize.toLowerCase()] || packageSize;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
-  };
+ 
 
   // Calculate total
   const totalPrice = items.reduce((sum, item) => 

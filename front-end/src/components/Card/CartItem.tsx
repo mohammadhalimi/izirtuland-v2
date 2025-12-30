@@ -1,14 +1,7 @@
 // src/components/cart/CartItem.tsx
 import { component$ } from '@builder.io/qwik';
 import { MinusIcon, PlusIcon, TrashIcon, LoaderIcon } from '~/components/icons';
-
-interface CartItemProps {
-  item: any;
-  isUpdating: boolean;
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onRemove: (id: string, name: string) => void;
-  formatPackageSize: (size: string) => string;
-}
+import { CartItemProps } from '../types/card';
 
 export default component$<CartItemProps>(({ 
   item, 

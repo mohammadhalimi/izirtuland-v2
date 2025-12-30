@@ -1,12 +1,7 @@
 // src/components/cart/CartHeader.tsx
 import { component$ } from '@builder.io/qwik';
 import { ArrowLeftIcon, CartIcon } from '~/components/icons';
-
-interface CartHeaderProps {
-  uniqueProducts: number;
-  totalUnits: number;
-  totalPrice: number;
-}
+import { CartHeaderProps } from '../types/card';
 
 export default component$<CartHeaderProps>(({ uniqueProducts, totalUnits, totalPrice }) => {
   return (

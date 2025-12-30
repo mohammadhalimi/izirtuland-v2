@@ -1,11 +1,7 @@
 // src/components/cart/ShippingProgress.tsx
 import { component$ } from '@builder.io/qwik';
 import { TruckIcon } from '~/components/icons';
-
-interface ShippingProgressProps {
-  totalPrice: number;
-  shippingThreshold: number;
-}
+import { ShippingProgressProps } from '../types/card';
 
 export default component$<ShippingProgressProps>(({ totalPrice, shippingThreshold }) => {
   const progress = Math.min((totalPrice / shippingThreshold) * 100, 100);

@@ -56,3 +56,10 @@ export type FieldErrors = {
   password?: string[];
   rememberMe?: string[];
 };
+
+export interface AdminData {
+  _id: string;
+  username: string;
+  role: "admin" | "superadmin";
+  profileImage: string;
+}

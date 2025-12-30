@@ -3,6 +3,7 @@ import type { Order } from "~/components/types/order";
 import { OrderItems } from "./OrderItems";
 import { StatusBadge } from "./StatusBadge";
 import { API_BASE_URL } from "~/config/api";
+import { formatDate,formatPrice } from "~/components/function/function";
 
 export const OrdersTable = component$<{
   orders: Order[];
@@ -33,20 +34,6 @@ export const OrdersTable = component$<{
     alert("✅ سفارش با موفقیت تکمیل شد");
     window.location.reload();
   });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
-  };
 
   if (orders.length === 0) {
     return (
