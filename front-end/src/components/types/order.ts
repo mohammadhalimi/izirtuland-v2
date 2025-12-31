@@ -26,3 +26,23 @@ export interface Order {
   status: 'iscompleted' | 'paid' | 'failed';
   createdAt: string;
 }
+
+export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+
+export interface NotificationProps {
+  type?: NotificationType;
+  message: string;
+  duration?: number;
+  isVisible: boolean;
+  onClose?: () => void;
+}
+
+export interface ConfirmDialogProps {
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isVisible: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
