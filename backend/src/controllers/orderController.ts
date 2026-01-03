@@ -31,7 +31,6 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       name: user.name,
       address: user.address,
     });
-    console.log("items.brand--------------------", items);
 
     return res.status(201).json({
       orderId: order._id,
