@@ -117,3 +117,36 @@ export const getModelColors = (model: string) => {
             border: 'border-purple-200'
         };
 };
+
+export const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
+// Helper functions
+export const getStatusClass = (status: string) => {
+  switch (status) {
+    case 'paid': 
+      return 'bg-green-100 text-green-800 border border-green-200';
+    case 'iscompleted': 
+      return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+    case 'pending': 
+      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+    case 'failed': 
+      return 'bg-red-100 text-red-800 border border-red-200';
+    default: 
+      return 'bg-gray-100 text-gray-800 border border-gray-200';
+  }
+};
+
+export const getStatusText = (status: string) => {
+  switch (status) {
+    case 'paid': return 'پرداخت شده';
+    case 'iscompleted': return 'تکمیل شده';
+    case 'pending': return 'در انتظار پرداخت';
+    case 'failed': return 'لغو شده';
+    default: return status;
+  }
+};

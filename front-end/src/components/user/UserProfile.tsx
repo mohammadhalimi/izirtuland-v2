@@ -11,6 +11,7 @@ import EditProfileModal from "../UserProfile/EditProfileModal";
 import LoadingSpinner from "../UserProfile/LoadingSpinner";
 import EmptyOrdersState from "../UserProfile/EmptyOrdersState";
 import CheckoutPreview from "../UserProfile/CheckoutPreview";
+import SearchBar from "../UserProfile/SearchBar";
 
 export default component$(() => {
     const state = useStore<{
@@ -25,6 +26,7 @@ export default component$(() => {
             completedOrders: number;
             totalSpent: number;
         };
+        searchTerm: string; // اضافه شده برای جستجو
     }>({
         user: null,
         orders: [],
@@ -36,7 +38,8 @@ export default component$(() => {
             pendingOrders: 0,
             completedOrders: 0,
             totalSpent: 0
-        }
+        },
+        searchTerm: '' // مقدار اولیه
     });
 
     const showEditModal = useSignal(false);
@@ -122,14 +125,90 @@ export default component$(() => {
             if (data.success) {
                 window.location.reload();
             }
-        } catch (err) {
+        } catch {
             alert("خطا در خروج از حساب");
         }
     });
 
     const handleTabChange = $((tab: 'complete-purchase' | 'pending-orders' | 'completed-orders') => {
         state.activeTab = tab;
+        state.searchTerm = ''; // پاک کردن جستجو هنگام تغییر تب
     });
+    
+    // تابع جستجو
+    const handleSearch = $((term: string) => {
+        state.searchTerm = term;
+    });
+    
+    // پاک کردن جستجو
+    const clearSearch = $(() => {
+        state.searchTerm = '';
+    });
+    
+    // فیلتر کردن سفارشات بر اساس وضعیت و جستجو
+    const filterOrdersByTabAndSearch = (orders: Order[], tab: string, searchTerm: string) => {
+        let filtered = orders;
+        
+        // فیلتر بر اساس تب
+        if (tab === 'pending-orders') {
+            filtered = filtered.filter(order => order.status === 'paid');
+        } else if (tab === 'completed-orders') {
+            filtered = filtered.filter(order => order.status === 'iscompleted');
+        }
+        
+        // فیلتر بر اساس جستجو
+        if (searchTerm.trim()) {
+            const term = searchTerm.toLowerCase().trim();
+            filtered = filtered.filter(order => {
+                // جستجو در کد رهگیری
+                if (order.payment?.trackId?.toString().toLowerCase().includes(term)) {
+                    return true;
+                }
+                
+                // جستجو در شماره سفارش
+                if (order._id.toLowerCase().includes(term)) {
+                    return true;
+                }
+                
+                // جستجو در نام
+                if (order.name?.toLowerCase().includes(term)) {
+                    return true;
+                }
+                
+                // جستجو در شماره تلفن
+                if (order.phone?.toLowerCase().includes(term)) {
+                    return true;
+                }
+                
+                // جستجو در آدرس
+                if (order.address?.toLowerCase().includes(term)) {
+                    return true;
+                }
+                
+                // جستجو در محصولات
+                return order.items.some(item => 
+                    item.product?.name?.toLowerCase().includes(term) ||
+                    item.brand?.toLowerCase().includes(term) ||
+                    item.packageSize?.toLowerCase().includes(term)
+                );
+            });
+        }
+        
+        return filtered;
+    };
+    
+    // سفارشات فیلتر شده
+    const filteredOrders = filterOrdersByTabAndSearch(state.orders, state.activeTab, state.searchTerm);
+    
+    // آمار سفارشات فیلتر شده
+    const filteredStats = {
+        total: filteredOrders.length,
+        pending: filteredOrders.filter(order => order.status === 'paid').length,
+        completed: filteredOrders.filter(order => order.status === 'iscompleted').length,
+        totalSpent: filteredOrders
+            .filter(order => order.status === 'iscompleted')
+            .reduce((sum, order) => sum + order.totalPrice, 0)
+    };
     
     const onSave$ = $(async (name: string, address: string) => {
         if (!state.user) return;
@@ -157,7 +236,7 @@ export default component$(() => {
             } else {
                 editError.value = data.message || 'خطا در بروزرسانی پروفایل';
             }
-        } catch (err) {
+        } catch {
             editError.value = "خطا در ارتباط با سرور";
         } finally {
             editLoading.value = false;
@@ -188,13 +267,6 @@ export default component$(() => {
         return null;
     }
 
-    // فیلتر کردن سفارشات بر اساس وضعیت
-    const completedOrders = state.orders.filter(order => order.status === 'iscompleted');
-    const pendingOrders = state.orders.filter(order => 
-        order.status === 'paid'
-    );
-    const hasPendingOrders = pendingOrders.length > 0;
-
     return (
         <div class="min-h-screen bg-linear-to-br from-green-50 to-emerald-50">
             <UserProfileHeader user={state.user} onLogout={logout} />
@@ -204,27 +276,31 @@ export default component$(() => {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <UserStatsCard
                         title="کل سفارشات"
-                        value={state.stats.totalOrders}
+                        value={state.searchTerm ? filteredStats.total : state.stats.totalOrders}
                         icon="📦"
                         color="green"
+                        isFiltered={!!state.searchTerm}
                     />
                     <UserStatsCard
                         title="در انتظار"
-                        value={state.stats.pendingOrders}
+                        value={state.searchTerm ? filteredStats.pending : state.stats.pendingOrders}
                         icon="⏳"
                         color="blue"
+                        isFiltered={!!state.searchTerm}
                     />
                     <UserStatsCard
                         title="تکمیل شده"
-                        value={state.stats.completedOrders}
+                        value={state.searchTerm ? filteredStats.completed : state.stats.completedOrders}
                         icon="✅"
                         color="emerald"
+                        isFiltered={!!state.searchTerm}
                     />
                     <UserStatsCard
                         title="کل هزینه‌ها"
-                        value={`${state.stats.totalSpent.toLocaleString()} تومان`}
+                        value={`${(state.searchTerm ? filteredStats.totalSpent : state.stats.totalSpent).toLocaleString()} تومان`}
                         icon="💰"
                         color="green"
+                        isFiltered={!!state.searchTerm}
                     />
                 </div>
 
@@ -240,10 +316,44 @@ export default component$(() => {
                     {/* محتوای اصلی */}
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                            <ProfileTabs
-                                activeTab={state.activeTab}
-                                onTabChange={handleTabChange}
-                            />
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                <ProfileTabs
+                                    activeTab={state.activeTab}
+                                    onTabChange={handleTabChange}
+                                />
+                                
+                                {/* نوار جستجو - فقط برای تب‌های سفارشات */}
+                                {(state.activeTab === 'pending-orders' || state.activeTab === 'completed-orders') && (
+                                    <SearchBar
+                                        searchTerm={state.searchTerm}
+                                        onSearchInput={handleSearch}
+                                        placeholder="جستجو در سفارشات..."
+                                        onClear={clearSearch}
+                                    />
+                                )}
+                            </div>
+
+                            {/* وضعیت جستجو */}
+                            {state.searchTerm && (
+                                <div class="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-yellow-700">🔍</span>
+                                            <span class="text-sm text-yellow-800">
+                                                نتایج جستجو برای: 
+                                                <span class="font-bold mr-1"> "{state.searchTerm}"</span>
+                                                ({filteredOrders.length} مورد یافت شد)
+                                            </span>
+                                        </div>
+                                        <button
+                                            onClick$={clearSearch}
+                                            class="text-yellow-700 hover:text-yellow-800 text-sm"
+                                        >
+                                            پاک کردن ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <div class="mt-6">
                                 {state.activeTab === 'complete-purchase' ? (
@@ -274,21 +384,45 @@ export default component$(() => {
                                             سفارشات در حال انتظار
                                         </h3>
                                         <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                                            {!hasPendingOrders ? (
-                                                <EmptyOrdersState
-                                                    icon="⏳"
-                                                    title="هیچ سفارش در حال انتظاری ندارید"
-                                                    subtitle="سفارشات شما پس از ثبت در این بخش نمایش داده می‌شوند"
-                                                    buttonText="شروع خرید جدید"
-                                                    onButtonClick$={() => state.activeTab = 'complete-purchase'}
-                                                />
+                                            {filteredOrders.length === 0 ? (
+                                                <div class="text-center py-8">
+                                                    {state.searchTerm ? (
+                                                        <>
+                                                            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                                <span class="text-2xl">🔍</span>
+                                                            </div>
+                                                            <h4 class="text-lg font-medium text-gray-900 mb-2">
+                                                                سفارشی با عبارت "<span class="text-green-600">{state.searchTerm}</span>" یافت نشد
+                                                            </h4>
+                                                            <p class="text-gray-600 mb-4">
+                                                                لطفاً عبارت جستجوی خود را تغییر دهید یا جستجو را پاک کنید
+                                                            </p>
+                                                            <button
+                                                                onClick$={clearSearch}
+                                                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                                            >
+                                                                مشاهده همه سفارشات در انتظار
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <EmptyOrdersState
+                                                            icon="⏳"
+                                                            title="هیچ سفارش در حال انتظاری ندارید"
+                                                            subtitle="سفارشات شما پس از ثبت در این بخش نمایش داده می‌شوند"
+                                                            buttonText="شروع خرید جدید"
+                                                            onButtonClick$={() => state.activeTab = 'complete-purchase'}
+                                                        />
+                                                    )}
+                                                </div>
                                             ) : (
                                                 <div class="space-y-4">
-                                                    {pendingOrders.map((order) => (
+                                                    {filteredOrders.map((order) => (
                                                         <OrderCard 
                                                             key={order._id} 
                                                             order={order} 
                                                             showStatus={true}
+                                                            searchTerm={state.searchTerm}
+                                                            showSearchHighlight={!!state.searchTerm}
                                                         />
                                                     ))}
                                                 </div>
@@ -300,21 +434,45 @@ export default component$(() => {
                                         <h3 class="text-xl font-bold text-gray-900 mb-4">
                                             سفارشات تکمیل شده
                                         </h3>
-                                        {completedOrders.length === 0 ? (
-                                            <EmptyOrdersState
-                                                icon="✅"
-                                                title="هنوز سفارش تکمیل شده‌ای ندارید"
-                                                subtitle="اولین سفارش خود را ثبت کنید و از مزایای خرید آنلاین بهره‌مند شوید"
-                                                buttonText="شروع خرید"
-                                                onButtonClick$={() => state.activeTab = 'complete-purchase'}
-                                            />
+                                        {filteredOrders.length === 0 ? (
+                                            <div class="text-center py-8">
+                                                {state.searchTerm ? (
+                                                    <>
+                                                        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                            <span class="text-2xl">🔍</span>
+                                                        </div>
+                                                        <h4 class="text-lg font-medium text-gray-900 mb-2">
+                                                            سفارشی با عبارت "<span class="text-green-600">{state.searchTerm}</span>" یافت نشد
+                                                        </h4>
+                                                        <p class="text-gray-600 mb-4">
+                                                            لطفاً عبارت جستجوی خود را تغییر دهید یا جستجو را پاک کنید
+                                                        </p>
+                                                        <button
+                                                            onClick$={clearSearch}
+                                                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                                        >
+                                                            مشاهده همه سفارشات تکمیل شده
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <EmptyOrdersState
+                                                        icon="✅"
+                                                        title="هنوز سفارش تکمیل شده‌ای ندارید"
+                                                        subtitle="اولین سفارش خود را ثبت کنید و از مزایای خرید آنلاین بهره‌مند شوید"
+                                                        buttonText="شروع خرید"
+                                                        onButtonClick$={() => state.activeTab = 'complete-purchase'}
+                                                    />
+                                                )}
+                                            </div>
                                         ) : (
                                             <div class="space-y-4">
-                                                {completedOrders.map((order) => (
+                                                {filteredOrders.map((order) => (
                                                     <OrderCard 
                                                         key={order._id} 
                                                         order={order} 
                                                         isCompleted={true}
+                                                        searchTerm={state.searchTerm}
+                                                        showSearchHighlight={!!state.searchTerm}
                                                     />
                                                 ))}
                                             </div>

@@ -1,39 +1,43 @@
-// src/components/user/UserStatsCard.tsx
+// src/components/user/UserStatsCard.tsx (نسخه به‌روزرسانی شده)
 import { component$ } from '@builder.io/qwik';
 
-interface StatsCardProps {
+interface UserStatsCardProps {
   title: string;
   value: string | number;
   icon: string;
-  color: 'green' | 'yellow' | 'emerald' | 'blue';
-  trend?: string;
+  color: 'green' | 'blue' | 'emerald' | 'yellow';
+  isFiltered?: boolean;
 }
 
-export default component$<StatsCardProps>(({ title, value, icon, color, trend }) => {
+export default component$<UserStatsCardProps>(({ 
+  title, 
+  value, 
+  icon, 
+  color,
+  isFiltered = false
+}) => {
   const colorClasses = {
-    green: 'bg-green-100 text-green-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    emerald: 'bg-emerald-100 text-emerald-600',
-    blue: 'bg-blue-100 text-blue-600'
+    green: 'bg-green-100 text-green-700 border-green-200',
+    blue: 'bg-blue-100 text-blue-700 border-blue-200',
+    emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200'
   };
 
   return (
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">{title}</p>
-          <p class={`text-3xl font-bold mt-2 ${color === 'green' ? 'text-gray-900' : color === 'yellow' ? 'text-yellow-600' : color === 'emerald' ? 'text-emerald-600' : 'text-green-600'}`}>
-            {value}
-          </p>
-          {trend && (
-            <p class="text-xs mt-2 text-gray-500">
-              {trend}
-            </p>
-          )}
+    <div class={`rounded-xl border p-5 transition-all duration-200 ${colorClasses[color]} ${isFiltered ? 'ring-2 ring-yellow-300' : ''}`}>
+      <div class="flex items-center justify-between mb-3">
+        <div class={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses[color].split(' ')[0]} border ${colorClasses[color].split(' ')[2]}`}>
+          <span class="text-lg">{icon}</span>
         </div>
-        <div class={`w-12 h-12 ${colorClasses[color]} rounded-xl flex items-center justify-center`}>
-          <span class="text-2xl">{icon}</span>
-        </div>
+        {isFiltered && (
+          <span class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">
+            فیلتر شده
+          </span>
+        )}
+      </div>
+      <div>
+        <div class="text-sm text-gray-600 mb-1">{title}</div>
+        <div class="font-bold text-2xl">{typeof value === 'number' ? value.toLocaleString() : value}</div>
       </div>
     </div>
   );

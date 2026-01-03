@@ -2,27 +2,66 @@
 import { component$ } from '@builder.io/qwik';
 import type { Order } from '../types/user';
 import OrderItemCard from './OrderItemCard';
+import { formatDate, formatTime, getStatusClass, getStatusText } from '../function/function';
 
 interface OrderCardProps {
   order: Order;
   isCompleted?: boolean;
   showStatus?: boolean;
+  searchTerm?: string; // اضافه شده برای جستجو
+  showSearchHighlight?: boolean; // اضافه شده برای هایلایت
 }
 
-export default component$<OrderCardProps>(({ order, isCompleted = false, showStatus = false }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR');
+export default component$<OrderCardProps>(({ 
+  order, 
+  showStatus = false,
+  searchTerm = '',
+  showSearchHighlight = false
+}) => {
+
+  // تابع برای هایلایت متن مطابق با جستجو
+  const highlightSearchText = (text: string) => {
+    if (!searchTerm || !showSearchHighlight || !text) return text;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const textLower = text.toString().toLowerCase();
+    
+    if (textLower.includes(searchLower)) {
+      const parts = text.toString().split(new RegExp(`(${searchTerm})`, 'gi'));
+      
+      return (
+        <span>
+          {parts.map((part, index) => 
+            part.toLowerCase() === searchLower ? 
+              <mark key={index} class="bg-yellow-200 px-1 rounded mx-0.5">{part}</mark> : 
+              part
+          )}
+        </span>
+      );
+    }
+    
+    return text;
   };
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('fa-IR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // بررسی اینکه آیا این سفارش با عبارت جستجو مطابقت دارد
+  const isMatchingSearch = searchTerm && showSearchHighlight ? 
+    (order.payment?.trackId?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order.items.some(item => 
+       item.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       item.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+     )) : true;
+
+  // اگر در حال جستجو هستیم و سفارش مطابقت ندارد، کارت را نشان نده
+  if (searchTerm && showSearchHighlight && !isMatchingSearch) {
+    return null;
+  }
 
   return (
-    <div class="bg-white border border-green-100 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+    <div class={`bg-white border ${searchTerm && isMatchingSearch ? 'border-yellow-300' : 'border-green-100'} rounded-2xl p-6 hover:shadow-lg transition-all duration-200 ${searchTerm && isMatchingSearch ? 'ring-2 ring-yellow-100' : ''}`}>
       {/* Header Section */}
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         {/* Order Info */}
@@ -33,12 +72,22 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
           <div>
             <div class="flex items-center gap-3 mb-2">
               <h3 class="font-bold text-lg text-gray-900">
-                کد رهگیری #{order.payment.trackId || order._id.slice(-6)}
+                کد رهگیری #
+                {highlightSearchText(order.payment.trackId?.toString() || order._id.slice(-6))}
               </h3>
+              
               {/* Status Badge */}
               {showStatus && (
                 <span class={`px-3 py-1 rounded-full text-sm font-medium ${getStatusClass(order.status)}`}>
                   {getStatusText(order.status)}
+                </span>
+              )}
+              
+              {/* نشانه مطابقت با جستجو */}
+              {searchTerm && isMatchingSearch && showSearchHighlight && (
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium flex items-center gap-1">
+                  <span>🔍</span>
+                  <span>مطابقت دارد</span>
                 </span>
               )}
             </div>
@@ -79,7 +128,9 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
             {order.name && (
               <div>
                 <div class="text-xs text-gray-500 mb-1">نام و نام خانوادگی</div>
-                <div class="font-medium text-gray-900">{order.name}</div>
+                <div class="font-medium text-gray-900">
+                  {highlightSearchText(order.name)}
+                </div>
               </div>
             )}
             
@@ -88,7 +139,7 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
                 <div class="text-xs text-gray-500 mb-1">شماره تماس</div>
                 <div class="font-medium text-gray-900 flex items-center gap-2">
                   <span>📞</span>
-                  <span>{order.phone}</span>
+                  <span>{highlightSearchText(order.phone)}</span>
                 </div>
               </div>
             )}
@@ -98,7 +149,7 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
                 <div class="text-xs text-gray-500 mb-1">آدرس</div>
                 <div class="font-medium text-gray-900 flex items-start gap-2">
                   <span class="mt-1">📍</span>
-                  <span>{order.address}</span>
+                  <span>{highlightSearchText(order.address)}</span>
                 </div>
               </div>
             )}
@@ -120,36 +171,26 @@ export default component$<OrderCardProps>(({ order, isCompleted = false, showSta
         
         <div class="space-y-3">
           {order.items.map((item, index) => (
-            <OrderItemCard key={index} item={item} index={index} />
+            <OrderItemCard 
+              key={index} 
+              item={item} 
+              index={index}
+              searchTerm={searchTerm}
+              showSearchHighlight={showSearchHighlight}
+            />
           ))}
         </div>
       </div>
+      
+      {/* اطلاعات جستجو (اگر فعال باشد) */}
+      {searchTerm && isMatchingSearch && showSearchHighlight && (
+        <div class="mt-4 pt-4 border-t border-yellow-200">
+          <div class="flex items-center gap-2 text-sm text-yellow-700">
+            <span>🔍</span>
+            <span>این سفارش با عبارت "<span class="font-bold">{searchTerm}</span>" مطابقت دارد</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
-
-// Helper functions
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case 'paid': 
-      return 'bg-green-100 text-green-800 border border-green-200';
-    case 'iscompleted': 
-      return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-    case 'pending': 
-      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-    case 'failed': 
-      return 'bg-red-100 text-red-800 border border-red-200';
-    default: 
-      return 'bg-gray-100 text-gray-800 border border-gray-200';
-  }
-};
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'paid': return 'پرداخت شده';
-    case 'iscompleted': return 'تکمیل شده';
-    case 'pending': return 'در انتظار پرداخت';
-    case 'failed': return 'لغو شده';
-    default: return status;
-  }
-};
