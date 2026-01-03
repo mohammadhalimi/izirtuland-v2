@@ -1,35 +1,49 @@
 import { component$, useStore, useVisibleTask$ } from '@builder.io/qwik';
 import { useLocation, Link } from '@builder.io/qwik-city';
 import type { PaymentData } from '~/components/types/payemnt';
+import { API_BASE_URL } from '~/config/api';
+
+// تابع لاگ برای حالت توسعه
+const devLog = (...args: any[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
 
 export default component$(() => {
   const loc = useLocation();
-  
+
   const state = useStore<{
     paymentData: PaymentData | null;
     isLoading: boolean;
     error: string;
+    smsSent: {
+      user: boolean;
+      admin: boolean;
+    };
+    smsError: string;
   }>({
     paymentData: null,
     isLoading: true,
-    error: ''
+    error: '',
+    smsSent: {
+      user: false,
+      admin: false
+    },
+    smsError: ''
   });
 
   useVisibleTask$(async () => {
     try {
       // استخراج پارامترها از URL
-      // روش 1: از searchParams استفاده کنیم
       const params = new URLSearchParams(loc.url.search);
-      
-      // روش 2: همچنین می‌توانیم از object URL استفاده کنیم
-      const url = new URL(loc.url.href);
-      const searchParams = url.searchParams;
-      const orderId = params.get('orderId') || searchParams.get('orderId');
-      const trackId = params.get('trackId') || searchParams.get('trackId');
-      const refNumber = params.get('refNumber') || searchParams.get('refNumber')
+      const orderId = params.get('orderId');
+      const trackId = params.get('trackId');
+      const refNumber = params.get('refNumber');
 
       if (!orderId || !trackId) {
         state.error = 'اطلاعات پرداخت ناقص است';
+        state.isLoading = false;
         return;
       }
 
@@ -43,14 +57,16 @@ export default component$(() => {
       // پاک کردن سبد خرید
       localStorage.removeItem('perebar_checkout');
       localStorage.removeItem('current_order');
-      
+
       // ذخیره سفارش در تاریخچه
       try {
         const existingOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+        const lastOrderItems = JSON.parse(localStorage.getItem('last_order_items') || '[]');
+
         existingOrders.unshift({
           _id: orderId,
           orderNumber: orderId,
-          items: JSON.parse(localStorage.getItem('last_order_items') || '[]'),
+          items: lastOrderItems,
           status: 'completed',
           createdAt: new Date().toISOString(),
           completedAt: new Date().toISOString(),
@@ -60,18 +76,116 @@ export default component$(() => {
             refNumber: refNumber || undefined
           }
         });
-        localStorage.setItem('user_orders', JSON.stringify(existingOrders));
+        
+        localStorage.setItem('user_orders', JSON.stringify(existingOrders));        
       } catch (storageError) {
-        console.error('Storage error:', storageError);
+        console.error('❌ Storage error:', storageError);
       }
+
+      state.isLoading = false;
 
     } catch (error) {
       console.error('❌ Error processing success page:', error);
       state.error = 'خطا در پردازش اطلاعات پرداخت';
-    } finally {
       state.isLoading = false;
     }
   });
+
+  useVisibleTask$(async () => {
+    // صبر کنید تا state.isLoading false شود و paymentData پر شود
+    if (state.isLoading || !state.paymentData?.orderId || !state.paymentData?.trackId) {
+      devLog('⏳ منتظر آماده‌سازی داده‌ها...');
+      return;
+    }
+
+    // بررسی اینکه آیا پیامک‌ها قبلاً ارسال شده‌اند
+    const smsSentStatus = localStorage.getItem(`smsSent_${state.paymentData.orderId}`);
+    if (smsSentStatus) {
+      return; // از ارسال مجدد پیامک جلوگیری می‌کنیم
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/sms/order-confirmation`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderId: state.paymentData.orderId,
+            trackId: state.paymentData.trackId
+          })
+        }
+      );
+
+      const result = await response.json();
+      
+      if (result.success) {
+        state.smsSent.user = result.data?.smsResults?.user?.sent || false;
+        state.smsSent.admin = result.data?.smsResults?.admin?.sent || false;
+
+        // ذخیره وضعیت ارسال پیامک در localStorage
+        localStorage.setItem(`smsSent_${state.paymentData.orderId}`, 'true');
+      } else {
+        devLog('⚠️ خطا در ارسال اس‌ام‌اس:', result.message);
+        state.smsError = result.message || 'خطا در ارسال پیامک تأیید';
+      }
+    } catch (error) {
+      console.error('❌ خطا در فراخوانی API:', error);
+      state.smsError = 'خطا در ارتباط با سرور';
+    }
+  });
+
+  // نمایش وضعیت اس‌ام‌اس در UI
+  const renderSMSStatus = () => {
+    if (state.smsError) {
+      return (
+        <div class="mt-4 p-3 bg-yellow-50 rounded-lg">
+          <div class="flex items-center justify-center gap-2 text-yellow-700">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm">{state.smsError}</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (state.smsSent.user || state.smsSent.admin) {
+      return (
+        <div class="space-y-2 mt-4">
+          {state.smsSent.user && (
+            <div class="flex items-center justify-center gap-2 p-2 bg-green-50 rounded-lg">
+              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm text-green-700">پیامک تأیید برای شما ارسال شد</span>
+            </div>
+          )}
+
+          {state.smsSent.admin && (
+            <div class="flex items-center justify-center gap-2 p-2 bg-blue-50 rounded-lg">
+              <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm text-blue-700">اطلاع‌رسانی به مدیریت ارسال شد</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center justify-center gap-2 text-gray-600">
+          <div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm">در حال ارسال پیامک تأیید...</span>
+        </div>
+      </div>
+    );
+  };
 
   if (state.isLoading) {
     return (
@@ -94,10 +208,10 @@ export default component$(() => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </div>
-          
+
           <h1 class="text-2xl font-bold text-gray-900 mb-3">❌ خطا</h1>
           <p class="text-gray-700 mb-6">{state.error}</p>
-          
+
           <div class="space-y-3">
             <Link
               href="/user"
@@ -119,12 +233,12 @@ export default component$(() => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
         </div>
-        
+
         <h1 class="text-2xl font-bold text-gray-900 mb-3">✅ پرداخت موفق</h1>
         <p class="text-gray-600 mb-6">
           سفارش شما با موفقیت ثبت و پرداخت شد.
         </p>
-        
+
         <div class="bg-gray-50 rounded-xl p-4 mb-6">
           <div class="space-y-3">
             <div class="flex justify-between items-center">
@@ -139,9 +253,6 @@ export default component$(() => {
                 {state.paymentData?.trackId || 'نامشخص'}
               </span>
             </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">مبلغ پرداختی:</span>
-            </div>
             {state.paymentData?.refNumber && (
               <div class="flex justify-between items-center">
                 <span class="text-gray-600">شماره پیگیری بانک:</span>
@@ -150,8 +261,11 @@ export default component$(() => {
             )}
           </div>
         </div>
-        
-        <div class="space-y-3">
+
+        {/* نمایش وضعیت ارسال اس‌ام‌اس */}
+        {renderSMSStatus()}
+
+        <div class="space-y-3 mt-6">
           <Link
             href="/User"
             class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md hover:shadow-lg"
@@ -165,7 +279,7 @@ export default component$(() => {
             بازگشت به صفحه اصلی
           </Link>
         </div>
-        
+
         <div class="mt-8 pt-6 border-t border-gray-200">
           <div class="text-center space-y-2">
             <p class="text-sm text-gray-600">
@@ -174,10 +288,6 @@ export default component$(() => {
             <p class="text-xs text-gray-500">
               این شماره را برای پیگیری حفظ کنید
             </p>
-            <div class="flex items-center justify-center gap-2 text-sm text-gray-500 mt-4">
-              <span>📧</span>
-              <span>رسید پرداخت به ایمیل شما ارسال خواهد شد</span>
-            </div>
           </div>
         </div>
       </div>

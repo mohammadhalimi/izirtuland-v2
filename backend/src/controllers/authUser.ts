@@ -3,7 +3,7 @@ import { Otp } from "../models/Otp";
 import { User } from "../models/User";
 import { sendVerifyCode } from "../services/kavenegar";
 import jwt from "jsonwebtoken";
-
+import { KavenegarTemplates } from "../services/kavenegar";
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 export const sendOtp = async (req: Request, res: Response) => {
@@ -18,7 +18,7 @@ export const sendOtp = async (req: Request, res: Response) => {
 
         // ارسال با کاوه نگار
         try {
-            const result = await sendVerifyCode(phone, code, "porbar");
+            const result = await sendVerifyCode(phone, code, KavenegarTemplates.OTP);
             return res.status(200).json({ success: true, message: "OTP sent", result });
         } catch (err) {
             console.error("Send SMS error:", err);
