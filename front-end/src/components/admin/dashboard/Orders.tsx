@@ -1,5 +1,5 @@
 // src/components/admin/Orders.tsx
-import { component$, Resource, useResource$, useSignal } from "@builder.io/qwik";
+import { $, component$, Resource, useResource$, useSignal } from "@builder.io/qwik";
 import type { Order } from "~/components/types/order";
 import { OrdersTable } from "../../dashboard/order/OrdersTable";
 import { API_BASE_URL } from "~/config/api";
@@ -11,8 +11,16 @@ interface OrdersProps {
 export default component$<OrdersProps>(({ authToken }) => {
   const activeTab = useSignal<'pending' | 'completed'>('pending');
   const searchQuery = useSignal('');
+  const refreshKey = useSignal(0); // اضافه کردن key برای trigger کردن refetch
 
-  const ordersResource = useResource$<Order[]>(async ({ cleanup }) => {
+  const refreshOrders = $(() => {
+    refreshKey.value++; // تغییر key باعث re-fetch می‌شود
+  });
+
+  const ordersResource = useResource$<Order[]>(async ({ track, cleanup }) => {
+    // track کردن refreshKey برای trigger کردن re-fetch
+    track(() => refreshKey.value);
+
     const controller = new AbortController();
     cleanup(() => controller.abort());
 
@@ -40,7 +48,7 @@ export default component$<OrdersProps>(({ authToken }) => {
           <h1 class="text-2xl font-bold text-gray-800 mb-2">📦 مدیریت سفارشات</h1>
           <p class="text-gray-600">مدیریت و پیگیری سفارشات کاربران</p>
         </div>
-        
+
         <div class="flex items-center gap-2 text-sm text-gray-500">
           <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full">👑 ادمین</div>
           <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">📊 داشبورد</div>
@@ -74,11 +82,10 @@ export default component$<OrdersProps>(({ authToken }) => {
           <div class="flex">
             <button
               onClick$={() => activeTab.value = 'pending'}
-              class={`flex-1 py-4 text-center font-medium transition-colors ${
-                activeTab.value === 'pending'
-                  ? 'text-green-700 bg-green-50 border-b-2 border-green-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
+              class={`flex-1 py-4 text-center font-medium transition-colors ${activeTab.value === 'pending'
+                ? 'text-green-700 bg-green-50 border-b-2 border-green-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
             >
               <div class="flex items-center justify-center gap-2">
                 <span>⏳</span>
@@ -87,7 +94,7 @@ export default component$<OrdersProps>(({ authToken }) => {
                   <Resource
                     value={ordersResource}
                     onResolved={(orders) => {
-                      const pendingOrders = orders.filter(order => 
+                      const pendingOrders = orders.filter(order =>
                         order.status === 'paid'
                       );
                       return pendingOrders.length;
@@ -97,14 +104,13 @@ export default component$<OrdersProps>(({ authToken }) => {
                 </span>
               </div>
             </button>
-            
+
             <button
               onClick$={() => activeTab.value = 'completed'}
-              class={`flex-1 py-4 text-center font-medium transition-colors ${
-                activeTab.value === 'completed'
-                  ? 'text-emerald-700 bg-emerald-50 border-b-2 border-emerald-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
+              class={`flex-1 py-4 text-center font-medium transition-colors ${activeTab.value === 'completed'
+                ? 'text-emerald-700 bg-emerald-50 border-b-2 border-emerald-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
             >
               <div class="flex items-center justify-center gap-2">
                 <span>✅</span>
@@ -113,7 +119,7 @@ export default component$<OrdersProps>(({ authToken }) => {
                   <Resource
                     value={ordersResource}
                     onResolved={(orders) => {
-                      const completedOrders = orders.filter(order => 
+                      const completedOrders = orders.filter(order =>
                         order.status === 'iscompleted'
                       );
                       return completedOrders.length;
@@ -141,7 +147,7 @@ export default component$<OrdersProps>(({ authToken }) => {
                 <div class="text-5xl mb-4">⚠️</div>
                 <p class="text-red-600 text-lg mb-2">{err.message}</p>
                 <p class="text-gray-600 mb-4">لطفاً دوباره تلاش کنید</p>
-                <button 
+                <button
                   onClick$={() => window.location.reload()}
                   class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
                 >
@@ -153,7 +159,7 @@ export default component$<OrdersProps>(({ authToken }) => {
               // فیلتر بر اساس جستجو
               const filteredOrders = orders.filter(order => {
                 if (!searchQuery.value) return true;
-                
+
                 const query = searchQuery.value.toLowerCase();
                 return (
                   (order.payment?.trackId?.toString() || '').includes(query) ||
@@ -164,11 +170,11 @@ export default component$<OrdersProps>(({ authToken }) => {
               });
 
               // جدا کردن سفارشات بر اساس تب
-              const pendingOrders = filteredOrders.filter(order => 
+              const pendingOrders = filteredOrders.filter(order =>
                 order.status === 'paid'
               );
-              
-              const completedOrders = filteredOrders.filter(order => 
+
+              const completedOrders = filteredOrders.filter(order =>
                 order.status === 'iscompleted'
               );
 
@@ -184,7 +190,7 @@ export default component$<OrdersProps>(({ authToken }) => {
                     <p class="text-gray-500 mb-6">
                       هیچ سفارشی با "{searchQuery.value}" پیدا نشد
                     </p>
-                    <button 
+                    <button
                       onClick$={() => searchQuery.value = ''}
                       class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
                     >
@@ -202,13 +208,13 @@ export default component$<OrdersProps>(({ authToken }) => {
                       {activeTab.value === 'pending' ? '⏳' : '✅'}
                     </div>
                     <h3 class="text-xl font-semibold text-gray-700 mb-2">
-                      {activeTab.value === 'pending' 
-                        ? 'هیچ سفارش در حال انتظاری ندارید' 
+                      {activeTab.value === 'pending'
+                        ? 'هیچ سفارش در حال انتظاری ندارید'
                         : 'هیچ سفارش تکمیل شده‌ای ندارید'}
                     </h3>
                     <p class="text-gray-500">
-                      {activeTab.value === 'pending' 
-                        ? 'سفارشات جدید در این بخش نمایش داده می‌شوند' 
+                      {activeTab.value === 'pending'
+                        ? 'سفارشات جدید در این بخش نمایش داده می‌شوند'
                         : 'سفارشات تکمیل شده در این بخش نمایش داده می‌شوند'}
                     </p>
                   </div>
@@ -221,15 +227,14 @@ export default component$<OrdersProps>(({ authToken }) => {
                   <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                       <div class="flex items-center gap-4">
-                        <div class={`px-3 py-2 rounded-lg ${
-                          activeTab.value === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-emerald-100 text-emerald-800'
-                        }`}>
+                        <div class={`px-3 py-2 rounded-lg ${activeTab.value === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-emerald-100 text-emerald-800'
+                          }`}>
                           <span class="font-bold">{currentOrders.length}</span>
                           سفارش
                         </div>
-                        
+
                         <div class="text-sm text-gray-600">
                           مجموع مبلغ:{" "}
                           <span class="font-bold text-green-700">
@@ -239,13 +244,13 @@ export default component$<OrdersProps>(({ authToken }) => {
                           </span>
                         </div>
                       </div>
-                      
+
                       {searchQuery.value && (
                         <div class="flex items-center gap-2">
                           <span class="text-sm text-gray-600">
                             نتایج برای: "{searchQuery.value}"
                           </span>
-                          <button 
+                          <button
                             onClick$={() => searchQuery.value = ''}
                             class="text-red-500 hover:text-red-700 text-sm"
                           >
@@ -257,9 +262,10 @@ export default component$<OrdersProps>(({ authToken }) => {
                   </div>
 
                   {/* Orders Table */}
-                  <OrdersTable 
-                    orders={currentOrders} 
+                  <OrdersTable
+                    orders={currentOrders}
                     authToken={authToken}
+                    onOrderUpdated={refreshOrders}
                   />
 
                   {/* Summary Footer */}
