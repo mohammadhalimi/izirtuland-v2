@@ -1,5 +1,5 @@
 // src/components/user/UserSidebar.tsx
-import { component$, QRL } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import type { User } from '../types/user';
 
 interface UserSidebarProps {

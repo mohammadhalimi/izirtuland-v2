@@ -13,11 +13,12 @@ export default component$(() => {
     useVisibleTask$(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/user/me`, {
+                
                 credentials: "include",
             });
             const data = await res.json();
             state.isAuthenticated = data.success;
-        } catch (err) {
+        } catch {
             state.isAuthenticated = false;
         } finally {
             state.loading = false;

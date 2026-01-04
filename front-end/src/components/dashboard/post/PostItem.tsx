@@ -14,6 +14,8 @@ export const PostItem = component$<PostItemProps>(({ post, onDeleteClick }) => {
               <img
                 src={getFullImageUrl(post.image)}
                 alt={post.title}
+                width={100}
+                height={100}
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 onError$={(e) => {
                   const target = e.target as HTMLImageElement;

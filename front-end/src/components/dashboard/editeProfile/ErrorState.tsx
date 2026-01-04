@@ -1,5 +1,5 @@
 // src/components/admin/dashboard/profile/ErrorState.tsx
-import { component$, $ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import { ErrorStateProps } from '~/components/types/editeProfile';
 
 export const ErrorState = component$<ErrorStateProps>(({ onRetry }) => {

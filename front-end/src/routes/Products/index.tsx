@@ -1,17 +1,11 @@
 // src/routes/products/index.tsx
-import { component$, useResource$, Resource, useSignal, useComputed$ } from '@builder.io/qwik';
+import { component$, useResource$, Resource, useSignal, } from '@builder.io/qwik';
+import { formatPackageSize, formatPrice, getFullImageUrl, normalizeText } from '~/components/function/function';
 import type { Product } from '~/components/types/product';
 import { UpText } from '~/components/ui/products/UpText';
 import { API_BASE_URL } from '~/config/api';
 
-const normalizeText = (text: string) => {
-    return text
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, ' ')        
-        .replace(/ي/g, 'ی')       
-        .replace(/ك/g, 'ک');   
-};
+
 
 export default component$(() => {
     // -----------  STATE های فیلترها  ---------------
@@ -31,17 +25,6 @@ export default component$(() => {
             return [];
         }
     });
-    
-    const getFullImageUrl = (imagePath: string | undefined) => {
-        if (!imagePath) return '';
-        if (imagePath.startsWith('http')) return imagePath;
-        return `${API_BASE_URL}${imagePath}`;
-    };
-
-    const formatPrice = (price: number) => {
-        return price.toLocaleString('fa-IR') + ' تومان';
-    };
-
     const getBrandColor = (brand: string): string => {
         if (brand === 'Izirtu Land') return 'blue';
         if (brand === 'Khak Shimi') return 'orange';
@@ -50,17 +33,6 @@ export default component$(() => {
 
     const getModelColor = (model: string) => {
         return model === 'جامد' ? 'green' : 'purple';
-    };
-
-    const formatPackageSize = (packageSize: string) => {
-        const sizeMap: { [key: string]: string } = {
-            '1kg': '1 کیلوگرم',
-            '10kg': '10 کیلوگرم',
-            '1litre': '1 لیتر',
-            '5liter': '5 لیتر',
-            '20litre': '20 لیتر'
-        };
-        return sizeMap[packageSize] || packageSize;
     };
 
     return (
@@ -212,6 +184,8 @@ export default component$(() => {
                                                         <img
                                                             src={getFullImageUrl(product.image)}
                                                             alt={product.name}
+                                                            height={48}
+                                                            width={100}
                                                             class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                                                             loading="lazy"
                                                         />

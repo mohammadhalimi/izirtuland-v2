@@ -1,6 +1,7 @@
 import { component$, useResource$, Resource } from '@builder.io/qwik';
 import type { Post } from '~/components/types/posts';
 import { API_BASE_URL } from '~/config/api';
+import { formatDate, getFullImageUrl, truncateContent } from '../function/function';
 
 export default component$(() => {
     const latestPostsResource = useResource$<Post[]>(async () => {
@@ -23,27 +24,6 @@ export default component$(() => {
             return [];
         }
     });
-
-    const getFullImageUrl = (imagePath: string | undefined) => {
-        if (!imagePath) return '';
-        if (imagePath.startsWith('http')) return imagePath;
-        return `${API_BASE_URL}${imagePath}`;
-    };
-
-    const formatDate = (dateString: string | undefined) => {
-        if (!dateString) return 'تاریخ نامشخص';
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('fa-IR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        }).format(date);
-    };
-
-    const truncateContent = (content: string, maxLength: number = 120) => {
-        if (content.length <= maxLength) return content;
-        return content.substring(0, maxLength) + '...';
-    };
 
     const getCategoryIcon = (tags: string[] | undefined) => {
         if (!tags || tags.length === 0) return '📚';
@@ -111,6 +91,8 @@ export default component$(() => {
                                                             <img
                                                                 src={getFullImageUrl(post.image)}
                                                                 alt={post.title}
+                                                                width={100}
+                                                                height={100}
                                                                 class="w-full h-full object-cover"
                                                             />
                                                         ) : (
@@ -162,6 +144,8 @@ export default component$(() => {
                                                                 <img
                                                                     src={getFullImageUrl(post.author.profileImage)}
                                                                     alt={post.author.username}
+                                                                    width={8}
+                                                                    height={8}
                                                                     class="w-8 h-8 rounded-full object-cover"
                                                                 />
                                                                 <span class="text-sm text-gray-600">
@@ -206,6 +190,8 @@ export default component$(() => {
                                                         <img
                                                             src={getFullImageUrl(post.image)}
                                                             alt={post.title}
+                                                            width={100}
+                                                            height={100}
                                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                         />
                                                     ) : (
@@ -243,6 +229,8 @@ export default component$(() => {
                                                             <img
                                                                 src={getFullImageUrl(post.author.profileImage)}
                                                                 alt={post.author.username}
+                                                                width={6}
+                                                                height={6}
                                                                 class="w-6 h-6 rounded-full object-cover"
                                                             />
                                                             <span class="text-xs text-gray-600">

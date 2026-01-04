@@ -1,5 +1,5 @@
 // src/components/admin/dashboard/profile/ProfileImageUpload.tsx
-import { component$, $ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import { ProfileImageUploadProps } from '~/components/types/editeProfile';
 
 export const ProfileImageUpload = component$<ProfileImageUploadProps>(({
@@ -31,6 +31,8 @@ export const ProfileImageUpload = component$<ProfileImageUploadProps>(({
                 <img 
                   src={previewUrl} 
                   alt="Preview" 
+                  width={100}
+                  height={100}
                   class="w-full h-full object-cover"
                 />
               ) : (

@@ -1,3 +1,4 @@
+import { QRL } from '@builder.io/qwik';
 import type { Post } from '~/components/types/posts';
 
 export interface PostsHeaderProps {
@@ -8,7 +9,7 @@ export interface PostsMessageProps {
   message: string;
   messageType: 'success' | 'error';
   errorMessage?: string;
-  onClose?: () => void;
+  onClose?: QRL<() => void>;
 }
 
 export interface CreatePostFormProps {
@@ -22,34 +23,34 @@ export interface CreatePostFormProps {
   newTag: string;
   previewUrl: string;
   isActionLoading: boolean;
-  onTitleChange: (value: string) => void;
-  onContentChange: (value: string) => void;
-  onMetaDescriptionChange: (value: string) => void;
-  onFileSelect: (event: Event) => void;
-  onTagInput: (value: string) => void;
-  onTagKeyPress: (event: KeyboardEvent) => void;
-  onAddTag: () => void;
-  onRemoveTag: (index: number) => void;
-  onResetForm: () => void;
-  onSubmit: () => void;
+  onTitleChange: QRL<(value: string) => void>;
+  onMetaDescriptionChange: QRL<(value: string) => void>;
+  onContentChange: QRL<(value: string) => void>;
+  onTagInput: QRL<(value: string) => void>;
+  onRemoveTag: QRL<(index: number) => void>;
+  onAddTag: QRL<() => void>;
+  onTagKeyPress: QRL<(e: KeyboardEvent) => void>;
+  onFileSelect: QRL<(e: Event) => void>;
+  onResetForm: QRL<() => void>;
+  onSubmit: QRL<() => void>;
 }
 
 export interface PostItemProps {
   post: Post;
-  onDeleteClick: (post: Post) => void;
+  onDeleteClick: QRL<(post: Post) => void>;
 }
 
 export interface PostsListProps {
   posts: Post[];
-  onDeleteClick: (post: Post) => void;
+  onDeleteClick: QRL<(post: Post) => void>;
 }
 
 export interface DeletePostModalProps {
   showModal: boolean;
   selectedPost: Post | null;
   isActionLoading: boolean;
-  onClose: () => void;
-  onConfirm: (postId: string) => void;
+  onClose: QRL<() => void>;
+  onConfirm: QRL<(postId: string) => void>;
 }
 
 export interface PostsProps {

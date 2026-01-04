@@ -26,8 +26,8 @@ export const FormField = component$(() => (
   </div>
 ));
 
-export const Label = component$<{ htmlFor: string }>(({ htmlFor }) => (
-  <label class="block text-sm font-medium text-gray-700 mb-2" for={htmlFor}>
+export const Label = component$<{ for: string }>((props) => (
+  <label class="block text-sm font-medium text-gray-700 mb-2" for={props.for}>
     <Slot />
   </label>
 ));
@@ -52,7 +52,7 @@ export const FieldError = component$<{ messages?: string[] }>(({ messages }) => 
 // Username Input
 export const UsernameInput = component$<UsernameInputProps>(({ fieldErrors }) => (
   <FormField>
-    <Label htmlFor="username">
+    <Label for="username">
       نام کاربری
     </Label>
     <InputWrapper icon="👤">
@@ -76,7 +76,7 @@ export const PasswordInput = component$<PasswordInputProps>(({ fieldErrors, show
 
   return (
     <FormField>
-      <Label htmlFor="password">
+      <Label for="password">
         رمز عبور
       </Label>
       <InputWrapper icon="🔒">

@@ -1,4 +1,4 @@
-import { $, component$, useStore, useVisibleTask$, useSignal } from '@builder.io/qwik';
+import { $, component$, useStore, useVisibleTask$, useSignal, QRL } from '@builder.io/qwik';
 import { useNavigate } from '@builder.io/qwik-city';
 import { API_BASE_URL } from '~/config/api';
 import EmptyOrdersState from '../UserProfile/EmptyOrdersState';
@@ -25,9 +25,9 @@ export default component$(() => {
     });
 
     // تابع نمایش نوتیفیکیشن
-    const showNotification = $((type: Notification['type'], message: string, title: string, options?: {
-        onConfirm?: () => void;
-        onCancel?: () => void;
+   const showNotification = $((type: Notification['type'], message: string, title: string, options?: {
+        onConfirm?: QRL<() => void>;  // تغییر به QRL
+        onCancel?: QRL<() => void>;   // تغییر به QRL
     }) => {
         const id = nextId.value++;
         const notification: Notification = {
@@ -429,6 +429,8 @@ export default component$(() => {
                                     <img
                                         src={getFullImageUrl(item.image)}
                                         alt={item.name}
+                                        width={100}
+                                        height={100}
                                         class="w-full h-full object-cover"
                                         onError$={(e) => {
                                             const target = e.target as HTMLImageElement;

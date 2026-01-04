@@ -1,3 +1,4 @@
+import { QRL } from "@builder.io/qwik";
 import { Customer } from "./customer";
 
 export interface CustomerStatsProps {
@@ -12,7 +13,7 @@ export interface CustomerStatsProps {
 export interface CustomerSearchProps {
   searchQuery: string;
   resultsCount: number;
-  onSearchChange: (value: string) => void;
+  onSearchChange: QRL<(value: string) => void>;
 }
 
 export interface CustomersTableProps {
@@ -27,10 +28,10 @@ export interface PaginationProps {
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
-  onPageChange: (page: number) => void;
+  onPageChange: QRL<(page: number) => void>;
 }
 
 export interface ErrorAlertProps {
   error: string;
-  onDismiss: () => void;
+  onDismiss: QRL<() => void>;
 }

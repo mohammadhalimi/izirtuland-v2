@@ -131,6 +131,8 @@ export const ProductForm = component$<ProductFormProps>((props) => {
               <img
                 src={props.productToEdit.image}
                 alt={props.productToEdit.name}
+                width={20}
+                height={20}
                 class="w-20 h-20 object-cover rounded-lg border border-gray-300"
               />
             </div>
@@ -143,6 +145,8 @@ export const ProductForm = component$<ProductFormProps>((props) => {
               <img
                 src={props.previewUrl}
                 alt="Preview"
+                width={32}
+                height={32}
                 class="w-32 h-32 object-cover rounded-lg border border-gray-300"
               />
             </div>

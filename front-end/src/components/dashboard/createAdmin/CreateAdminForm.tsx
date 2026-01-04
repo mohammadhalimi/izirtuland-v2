@@ -1,5 +1,5 @@
 // src/components/admin/dashboard/CreateAdminForm.tsx
-import { component$, $ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import { CreateAdminFormProps } from '~/components/types/createAdmin';
 
 export const CreateAdminForm = component$<CreateAdminFormProps>((props) => {
@@ -9,7 +9,6 @@ export const CreateAdminForm = component$<CreateAdminFormProps>((props) => {
         <h2 class="text-2xl font-bold text-gray-800 mb-2">➕ ایجاد ادمین جدید</h2>
         <p class="text-gray-600">در این بخش می‌توانید ادمین جدید به سیستم اضافه کنید</p>
       </div>
-
       <div class="space-y-4">
         {/* Username Field */}
         <div>

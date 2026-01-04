@@ -120,7 +120,7 @@ export default component$(() => {
         await cart.removeItem(id);
         showNotification('محصول با موفقیت از سبد خرید حذف شد', 'success');
       }
-    } catch (error) {
+    } catch {
       showNotification('خطا در حذف محصول', 'error');
     } finally {
       modalState.isProcessing = false;
@@ -136,7 +136,7 @@ export default component$(() => {
         await cart.clearCart();
         showNotification('سبد خرید با موفقیت خالی شد', 'success');
       }
-    } catch (error) {
+    } catch {
       showNotification('خطا در خالی کردن سبد خرید', 'error');
     } finally {
       modalState.isProcessing = false;
@@ -161,7 +161,7 @@ export default component$(() => {
         await cart.updateQuantity(id, newQuantity);
         showNotification('تعداد محصول به‌روزرسانی شد', 'success');
       }
-    } catch (error) {
+    } catch {
       showNotification('خطا در به‌روزرسانی تعداد', 'error');
     } finally {
       isUpdating.value = null;

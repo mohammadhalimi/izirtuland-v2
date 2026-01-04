@@ -2,6 +2,7 @@ import { component$, useResource$, Resource } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
 import { API_BASE_URL } from '~/config/api';
 import type { Product } from '../types/product';
+import { formatPackageSize, formatPrice, getFullImageUrl } from '../function/function';
 
 export default component$(() => {
   const productsResource = useResource$<Product[]>(async () => {
@@ -28,27 +29,6 @@ export default component$(() => {
       return [];
     }
   });
-
-  const formatPackageSize = (packageSize: string) => {
-    const sizeMap: { [key: string]: string } = {
-      '1kg': '1 کیلوگرم',
-      '10kg': '10 کیلوگرم',
-      '1litre': '1 لیتر',
-      '5liter': '5 لیتر',
-      '20litre': '20 لیتر'
-    };
-    return sizeMap[packageSize] || packageSize;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
-  };
-
-  const getFullImageUrl = (imagePath: string | undefined) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${API_BASE_URL}${imagePath}`;
-  };
 
   const getCategoryColor = (model: string) => {
     switch (model) {
@@ -155,6 +135,8 @@ export default component$(() => {
                             <img
                               src={imageUrl}
                               alt={product.name}
+                              width={100}
+                              height={100}
                               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                               loading="lazy"
                             />

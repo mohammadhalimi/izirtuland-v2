@@ -4,6 +4,7 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import type { Post } from '~/components/types/posts';
 import logoC from '../../media/j529981_photo_2025-01-19_19-18-17.webp'
 import { API_BASE_URL } from '~/config/api';
+import { formatDate, getFullImageUrl, truncateContent } from '~/components/function/function';
 
 // Loader برای دریافت تمام پست‌ها
 export const usePosts = routeLoader$(async () => {
@@ -41,26 +42,6 @@ export default component$(() => {
             }
         }
     });
-
-    const getFullImageUrl = (imagePath: string | undefined) => {
-        if (!imagePath) return '';
-        if (imagePath.startsWith('http')) return imagePath;
-        return `${API_BASE_URL}${imagePath}`;
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('fa-IR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        }).format(date);
-    };
-
-    const truncateContent = (content: string, maxLength: number = 120) => {
-        if (content.length <= maxLength) return content;
-        return content.substring(0, maxLength) + '...';
-    };
 
     return (
         <div class="min-h-screen bg-linear-to-br from-green-50 to-emerald-100">
@@ -128,6 +109,8 @@ export default component$(() => {
                                             <img
                                                 src={getFullImageUrl(post.image)}
                                                 alt={post.title}
+                                                width={100}
+                                                height={100}
                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
                                         </div>
@@ -173,6 +156,8 @@ export default component$(() => {
                                                 <img
                                                     src={getFullImageUrl(post.author.profileImage)}
                                                     alt={post.author.username}
+                                                    width={6}
+                                                    height={6}
                                                     class="w-6 h-6 rounded-full object-cover"
                                                 />
                                                 <span>{(post.author && post.author.username) || 'تیم کشاورزی'}</span>

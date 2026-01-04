@@ -35,7 +35,7 @@ export default component$(() => {
       } else {
         authState.error = data.message || 'خطا در ارسال کد تأیید';
       }
-    } catch (err) {
+    } catch {
       authState.error = 'خطا در ارتباط با سرور';
     } finally {
       authState.loading = false;
@@ -70,7 +70,7 @@ export default component$(() => {
       } else {
         authState.error = data.message || 'کد اشتباه است یا منقضی شده';
       }
-    } catch (err) {
+    } catch {
       authState.error = 'خطا در ارتباط با سرور';
     } finally {
       authState.loading = false;

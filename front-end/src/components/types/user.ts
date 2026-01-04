@@ -1,3 +1,5 @@
+import { QRL } from "@builder.io/qwik";
+
 // src/components/user/types.ts
 export interface User {
   _id: string;
@@ -58,8 +60,8 @@ export interface Notification {
   type: 'success' | 'error' | 'info' | 'warning' | 'confirm';
   message: string;
   title: string;
-  onConfirm?: () => void;
-  onCancel?: () => void;
+  onConfirm?: QRL<() => void>;
+  onCancel?: QRL<() => void>;
 }
 
 export interface CheckoutItem {

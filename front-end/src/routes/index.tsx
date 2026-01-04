@@ -1,5 +1,5 @@
 // src/routes/index.tsx
-import { component$, useSignal } from '@builder.io/qwik';
+import { component$, } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import Hero from '~/components/section/hero';
 import Category from '~/components/section/category';

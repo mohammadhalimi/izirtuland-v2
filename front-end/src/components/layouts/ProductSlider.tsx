@@ -177,6 +177,8 @@ export default component$<ProductSliderProps>(({
                               <img
                                 src={getFullImageUrl(product.image)}
                                 alt={product.name}
+                                width={100}
+                                height={100}
                                 class={`w-full h-full object-cover transition-all duration-700 ${hoveredProductId.value === product._id ? 'scale-110' : 'scale-100'
                                   }`}
                                 onError$={(e) => {

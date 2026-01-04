@@ -31,6 +31,8 @@ export const ProfileHeader = component$<ProfileHeaderProps>(({
                   src={profileImageUrl} 
                   alt={username}
                   class="w-full h-full object-cover"
+                  height={10}
+                  width={10}
                   onError$={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';

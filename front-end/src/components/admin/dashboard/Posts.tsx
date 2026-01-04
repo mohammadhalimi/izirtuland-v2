@@ -62,10 +62,9 @@ export default component$<PostsProps>(({ authToken }) => {
           createdAt: post.createdAt || new Date().toISOString()
         }));
       } else {
-        const errorText = await response.text();
         errorMessage.value = 'خطا در دریافت پست‌های شما';
       }
-    } catch (error) {
+    } catch  {
       errorMessage.value = 'خطا در ارتباط با سرور';
     } finally {
       isLoading.value = false;
@@ -196,7 +195,7 @@ export default component$<PostsProps>(({ authToken }) => {
         const data = JSON.parse(responseText);
         showMessage(data.message || 'خطا در حذف پست', 'error');
       }
-    } catch (error: any) {
+    } catch {
       showMessage('خطا در ارتباط با سرور', 'error');
     } finally {
       isActionLoading.value = false;

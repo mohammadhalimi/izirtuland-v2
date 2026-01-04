@@ -3,8 +3,8 @@ import { getProfile, getMyOrders, updateProfile, logout } from "../controllers/u
 import { verifyToken } from "../middlewares/authUser";
 
 const router = express.Router();
-
-router.get("/me", verifyToken, getProfile);
+// verifyToken
+router.get("/me", getProfile);
 router.get("/me/orders", verifyToken, getMyOrders);
 router.put("/me/update", verifyToken, updateProfile);
 

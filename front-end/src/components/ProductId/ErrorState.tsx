@@ -1,16 +1,21 @@
 // src/routes/products/[id]/ErrorState.tsx
-import { $, component$ } from '@builder.io/qwik';
+import { $, component$, QRL } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
-import { error } from 'console';
 
 export interface ErrorStateProps {
-    onRetry: () => void;
+    productId?: string;
+    onRetry?: QRL<() => void>;
 }
 
-export const ErrorState = component$<ErrorStateProps>(({ onRetry }) => {
+export const ErrorState = component$<ErrorStateProps>(({ productId, onRetry }) => {
 
     const handleRetry = $(() => {
-        onRetry();
+        if (onRetry) {
+            onRetry();
+        } else {
+            // اگر onRetry وجود نداشت، صفحه را رفرش کنیم
+            window.location.reload();
+        }
     });
     
     return (
@@ -22,11 +27,13 @@ export const ErrorState = component$<ErrorStateProps>(({ onRetry }) => {
             </div>
             <h3 class="text-2xl font-bold text-gray-900 mb-3">خطا در دریافت محصول</h3>
             <p class="text-gray-600 mb-6">
-                {error || 'محصول مورد نظر یافت نشد یا مشکلی در ارتباط با سرور وجود دارد.'}
+                {productId ? 
+                    `خطا در دریافت محصول با شناسه ${productId}` : 
+                    'محصول مورد نظر یافت نشد یا مشکلی در ارتباط با سرور وجود دارد.'}
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                    href="/Products"
+                    href="/products"
                     class="inline-block bg-linear-to-r from-green-600 to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300"
                 >
                     مشاهده همه محصولات

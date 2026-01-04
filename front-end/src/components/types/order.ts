@@ -1,3 +1,5 @@
+import { QRL } from "@builder.io/qwik";
+
 export interface OrderItem {
   product: {
     _id: string;
@@ -34,7 +36,7 @@ export interface NotificationProps {
   message: string;
   duration?: number;
   isVisible: boolean;
-  onClose?: () => void;
+  onClose?: QRL<() => void>;
 }
 
 export interface ConfirmDialogProps {
@@ -43,6 +45,6 @@ export interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   isVisible: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm: QRL<() => void>;
+  onCancel: QRL<() => void>;
 }

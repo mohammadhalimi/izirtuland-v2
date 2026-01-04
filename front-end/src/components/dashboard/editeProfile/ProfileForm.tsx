@@ -1,6 +1,6 @@
 // src/components/admin/dashboard/profile/ProfileForm.tsx
 import { component$ } from '@builder.io/qwik';
-import { ProfileFormProps } from '~/components/types/editeProfile';
+import type { ProfileFormProps } from '~/components/types/editeProfile';
 
 export const ProfileForm = component$<ProfileFormProps>((props) => {
   return (

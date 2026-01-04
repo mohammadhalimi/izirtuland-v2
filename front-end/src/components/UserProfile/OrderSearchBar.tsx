@@ -1,8 +1,8 @@
 // src/components/user/OrderSearchBar.tsx
-import { component$, useSignal, $ } from '@builder.io/qwik';
+import { component$, useSignal, $, QRL } from '@builder.io/qwik';
 
 interface OrderSearchBarProps {
-  onSearch: (searchTerm: string) => void;
+  onSearch: QRL<(searchTerm: string) => void>;
   placeholder?: string;
 }
 

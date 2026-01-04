@@ -1,5 +1,5 @@
 // src/components/ProductId/ProductActions.tsx
-import { component$ } from '@builder.io/qwik';
+import { component$, QRL } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
 import type { Product } from '~/components/types/product';
 
@@ -7,7 +7,7 @@ interface ProductActionsProps {
     product: Product;
     isProductInCart: boolean;
     isAddingToCart: boolean; // اضافه شده
-    onAddToCart: () => void; // این حالا یک QRL است
+    onAddToCart: QRL<() => void>; // این حالا یک QRL است
 }
 
 export const ProductActions = component$<ProductActionsProps>(({

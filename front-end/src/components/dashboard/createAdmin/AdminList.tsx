@@ -1,7 +1,7 @@
 // src/components/admin/dashboard/AdminList.tsx
-import { component$, $ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import { getFullImageUrl, formatDate } from '~/components/function/function';
-import type { AdminListProps,Admin } from '~/components/types/createAdmin';
+import type { AdminListProps } from '~/components/types/createAdmin';
 
 
 export const AdminList = component$<AdminListProps>((props) => {
@@ -85,6 +85,8 @@ export const AdminList = component$<AdminListProps>((props) => {
                         <img
                           src={getFullImageUrl(admin.profileImage)}
                           alt={admin.username}
+                          height={10}
+                          width={10}
                           class="w-full h-full object-cover"
                           onError$={(e) => {
                             const target = e.target as HTMLImageElement;

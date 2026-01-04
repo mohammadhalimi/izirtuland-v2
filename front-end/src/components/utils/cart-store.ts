@@ -1,5 +1,4 @@
 // src/utils/cart-store.ts
-import { useStore, useTask$ } from '@builder.io/qwik';
 import type { CartItem } from '~/context/cart-context';
 
 // کلاس Singleton برای مدیریت cart

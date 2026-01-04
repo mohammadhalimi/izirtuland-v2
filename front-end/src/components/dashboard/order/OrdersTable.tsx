@@ -1,4 +1,4 @@
-import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import { $, component$, QRL, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import type { Order } from "~/components/types/order";
 import { OrderItems } from "./OrderItems";
 import { StatusBadge } from "./StatusBadge";
@@ -10,7 +10,7 @@ import { Notification } from "./Notification";
 export const OrdersTable = component$<{
   orders: Order[];
   authToken: string;
-  onOrderUpdated?: () => void;
+  onOrderUpdated?: QRL<() => void>;
 }>(({ orders, authToken, onOrderUpdated }) => {
   // State برای نوتیفیکیشن
   const notificationState = useSignal({
@@ -29,15 +29,6 @@ export const OrdersTable = component$<{
 
   // State برای وضعیت لودینگ
   const updatingStatus = useSignal<string | null>(null);
-
-  // تابع نمایش نوتیفیکیشن
-  const showNotification = $((type: 'success' | 'error', message: string) => {
-    notificationState.value = {
-      show: true,
-      type,
-      message
-    };
-  });
 
   // تابع نمایش دایالوگ تایید
   const showConfirmDialog = $((orderId: string, title: string, message: string) => {
@@ -153,7 +144,12 @@ export const OrdersTable = component$<{
         isVisible={notificationState.value.show}
         type={notificationState.value.type}
         message={notificationState.value.message}
-        onClose={() => notificationState.value = { ...notificationState.value, show: false }}
+        onClose={$( // <-- اینجا با $ wrap کنید
+          () => {
+            notificationState.value = { ...notificationState.value, show: false };
+            // تابع هیچ چیزی برنمی‌گرداند (void)
+          }
+        )}
         duration={3000}
       />
       {/* Confirm Dialog */}

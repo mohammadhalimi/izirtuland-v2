@@ -1,6 +1,6 @@
 // src/components/admin/dashboard/DeleteAdminModal.tsx
-import { component$, $ } from '@builder.io/qwik';
-import type { Admin, DeleteAdminModalProps } from '~/components/types/createAdmin';
+import { component$ } from '@builder.io/qwik';
+import type { DeleteAdminModalProps } from '~/components/types/createAdmin';
 
 
 

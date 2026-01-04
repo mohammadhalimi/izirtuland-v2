@@ -12,8 +12,7 @@ interface RelatedProductsProps {
 }
 
 export const RelatedProducts = component$<RelatedProductsProps>(({ 
-    productsResource, 
-    productId, 
+    productsResource,
     apiBaseUrl, 
     onAddToCart 
 }) => {

@@ -1,7 +1,9 @@
+import { QRL } from "@builder.io/qwik";
+
 export interface CartActionsProps {
     uniqueProducts: number;
     totalUnits: number;
-    onClearCart: () => void;
+    onClearCart: QRL<() => void>;
 }
 
 export interface CartHeaderProps {
@@ -13,8 +15,8 @@ export interface CartHeaderProps {
 export interface CartItemProps {
     item: any;
     isUpdating: boolean;
-    onUpdateQuantity: (id: string, quantity: number) => void;
-    onRemove: (id: string, name: string) => void;
+    onUpdateQuantity: QRL<(id: string, quantity: number) => void>;
+    onRemove: QRL<(id: string, name: string) => void>;
     formatPackageSize: (size: string) => string;
 }
 

@@ -1,11 +1,11 @@
 // src/components/user/ProfileTabs.tsx
-import { component$ } from '@builder.io/qwik';
+import { component$, QRL } from '@builder.io/qwik';
 
 type TabType = 'complete-purchase' | 'pending-orders' | 'completed-orders';
 
 interface ProfileTabsProps {
   activeTab: TabType;
-  onTabChange: (tab: TabType) => void;
+  onTabChange: QRL<(tab: TabType) => void>;
 }
 
 export default component$<ProfileTabsProps>(({ activeTab, onTabChange }) => {

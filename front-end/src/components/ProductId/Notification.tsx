@@ -1,11 +1,11 @@
 // src/routes/products/[id]/Notification.tsx
-import { component$ } from '@builder.io/qwik';
+import { component$, QRL } from '@builder.io/qwik';
 
 interface NotificationProps {
     message: string;
     type: 'success' | 'error' | 'info';
     isVisible: boolean;
-    onClose: () => void;
+    onClose: QRL<() => void>;
 }
 
 export const Notification = component$<NotificationProps>(({ message, type, isVisible, onClose }) => {

@@ -1,6 +1,6 @@
 // src/components/admin/dashboard/posts/CreatePostForm.tsx
 import { component$, $ } from '@builder.io/qwik';
-import { CreatePostFormProps } from '~/components/types/post';
+import type { CreatePostFormProps } from '~/components/types/post';
 
 export const CreatePostForm = component$<CreatePostFormProps>((props) => {
   const isFormValid = () => {
@@ -10,6 +10,65 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
       !props.isActionLoading
     );
   };
+
+  // استفاده از متغیرهای خارجی برای نگهداری توابع
+  const propsObj = {
+    onTitleChange: props.onTitleChange,
+    onMetaDescriptionChange: props.onMetaDescriptionChange,
+    onContentChange: props.onContentChange,
+    onTagInput: props.onTagInput,
+    onRemoveTag: props.onRemoveTag,
+    onAddTag: props.onAddTag,
+    onTagKeyPress: props.onTagKeyPress,
+    onFileSelect: props.onFileSelect,
+    onResetForm: props.onResetForm,
+    onSubmit: props.onSubmit
+  };
+
+  // wrap توابع event handler با $
+  const handleTitleChange = $((value: string) => {
+    propsObj.onTitleChange(value);
+  });
+
+  const handleMetaDescriptionChange = $((value: string) => {
+    propsObj.onMetaDescriptionChange(value);
+  });
+
+  const handleContentChange = $((value: string) => {
+    propsObj.onContentChange(value);
+  });
+
+  const handleTagInput = $((value: string) => {
+    propsObj.onTagInput(value);
+  });
+
+  const handleRemoveTag = $((index: number) => {
+    propsObj.onRemoveTag(index);
+  });
+
+  const handleAddTag = $(() => {
+    propsObj.onAddTag();
+  });
+
+  const handleTagKeyPress = $((e: KeyboardEvent) => {
+    propsObj.onTagKeyPress(e);
+  });
+
+  const handleFileSelect = $((e: Event) => {
+    propsObj.onFileSelect(e);
+  });
+
+  const handleResetForm = $(() => {
+    propsObj.onResetForm();
+  });
+
+  const handleSubmit = $(() => {
+    propsObj.onSubmit();
+  });
+
+  // تعریف ابعاد تصویر
+  const imageWidth = 128;
+  const imageHeight = 128;
 
   return (
     <div class="bg-white rounded-2xl shadow-lg border border-green-200 p-6">
@@ -35,7 +94,7 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
           <input
             type="text"
             value={props.formState.title}
-            onInput$={(e) => props.onTitleChange((e.target as HTMLInputElement).value)}
+            onInput$={(e) => handleTitleChange((e.target as HTMLInputElement).value)}
             class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
             placeholder="عنوان جذاب و مختصر برای پست خود بنویسید..."
             maxLength={100}
@@ -58,7 +117,7 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
           </label>
           <textarea
             value={props.formState.metaDescription}
-            onInput$={(e) => props.onMetaDescriptionChange((e.target as HTMLTextAreaElement).value)}
+            onInput$={(e) => handleMetaDescriptionChange((e.target as HTMLTextAreaElement).value)}
             rows={3}
             class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 resize-none"
             placeholder="توضیح مختصر و جذاب برای موتورهای جستجو (حداکثر ۱۶۰ کاراکتر)..."
@@ -90,7 +149,7 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
                   <span>#{tag}</span>
                   <button
                     type="button"
-                    onClick$={() => props.onRemoveTag(index)}
+                    onClick$={() => handleRemoveTag(index)}
                     class="text-green-600 hover:text-green-800 text-xs transition-colors"
                   >
                     ✕
@@ -105,15 +164,15 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
             <input
               type="text"
               value={props.newTag}
-              onInput$={(e) => props.onTagInput((e.target as HTMLInputElement).value)}
-              onKeyPress$={props.onTagKeyPress}
+              onInput$={(e) => handleTagInput((e.target as HTMLInputElement).value)}
+              onKeyPress$={handleTagKeyPress}
               class="flex-1 px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
               placeholder="تگ جدید را وارد کنید (Enter برای اضافه کردن)"
               maxLength={20}
             />
             <button
               type="button"
-              onClick$={props.onAddTag}
+              onClick$={handleAddTag}
               disabled={!props.newTag.trim()}
               class={`px-4 py-3 rounded-xl font-medium transition-all duration-200 ${!props.newTag.trim()
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -135,7 +194,7 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
           </label>
           <textarea
             value={props.formState.content}
-            onInput$={(e) => props.onContentChange((e.target as HTMLTextAreaElement).value)}
+            onInput$={(e) => handleContentChange((e.target as HTMLTextAreaElement).value)}
             rows={6}
             class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 resize-none"
             placeholder="متن کامل پست خود را اینجا بنویسید..."
@@ -162,7 +221,7 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
           <input
             type="file"
             accept="image/*"
-            onChange$={props.onFileSelect}
+            onChange$={handleFileSelect}
             class="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
           />
 
@@ -173,6 +232,8 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
               <img
                 src={props.previewUrl}
                 alt="Preview"
+                width={imageWidth}  // اضافه کردن width
+                height={imageHeight} // اضافه کردن height
                 class="w-32 h-32 object-cover rounded-lg border border-green-300"
               />
             </div>
@@ -182,13 +243,13 @@ export const CreatePostForm = component$<CreatePostFormProps>((props) => {
         {/* دکمه‌های اقدام */}
         <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
           <button
-            onClick$={props.onResetForm}
+            onClick$={handleResetForm}
             class="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium border border-gray-300"
           >
             پاک کردن فرم
           </button>
           <button
-            onClick$={props.onSubmit}
+            onClick$={handleSubmit}
             disabled={!isFormValid()}
             class={`px-8 py-3 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 rtl:space-x-reverse shadow-md hover:shadow-lg
                 ${!isFormValid()

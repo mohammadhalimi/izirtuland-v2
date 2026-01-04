@@ -26,7 +26,7 @@ export const useAuthCheck = routeLoader$(({ cookie, redirect }) => {
       admin: adminData,
       token: authToken
     };
-  } catch (error) {
+  } catch {
     cookie.delete('auth-token', { path: '/' });
     cookie.delete('admin-data', { path: '/' });
     throw redirect(302, '/Admin');
@@ -113,6 +113,8 @@ export default component$(() => {
                 <img
                   src={getFullImageUrl(authData.value.admin.profileImage)}
                   alt="Profile"
+                  width={100}
+                  height={`00`}
                   class="w-full h-full object-cover rounded-full"
                   onError$={(event) => {
                     const target = event.target as HTMLImageElement;
@@ -165,6 +167,8 @@ export default component$(() => {
                 <img
                   src={getFullImageUrl(authData.value.admin.profileImage)}
                   alt="Profile"
+                  width={100}
+                  height={100}
                   class="w-full h-full object-cover rounded-full"
                   onError$={(event) => {
                     const target = event.target as HTMLImageElement;

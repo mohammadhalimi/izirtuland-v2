@@ -62,10 +62,9 @@ export default component$<CustomerManagerProps>(({ authToken }) => {
         };
 
       } else {
-        const errorText = await response.text();
         state.error = `خطای سرور: ${response.status}`;
       }
-    } catch (err: any) {
+    } catch {
       state.error = 'خطا در ارتباط با سرور';
     } finally {
       state.loading = false;
@@ -135,9 +134,11 @@ export default component$<CustomerManagerProps>(({ authToken }) => {
       </div>
 
       {/* نمایش خطا */}
-      <ErrorAlert 
+      <ErrorAlert
         error={state.error}
-        onDismiss={() => state.error = ''}
+        onDismiss={$(() => {  // با $ wrap کنید
+          state.error = '';
+        })}
       />
 
       {/* کارت‌های آمار */}

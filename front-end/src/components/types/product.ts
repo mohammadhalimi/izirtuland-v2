@@ -17,8 +17,8 @@ export interface Product {
 export interface ProductListProps {
   products: Product[];
   loading: boolean;
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onEdit: QRL<(product: Product) => void>;
+  onDelete: QRL<(product: Product) => void>;
 }
 
 export interface ProductFormData {
@@ -53,15 +53,15 @@ export interface DeleteModalProps {
   show: boolean;
   product: Product | null;
   loading: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  onClose: QRL<() => void>;
+  onConfirm: QRL<() => void>;
 }
 
 export interface ErrorAlertProps {
   message: string;
-  onClose: () => void;
+  onClose: QRL<() => void>;
 }
 
 export interface ProductManagerHeaderProps {
-  onCreateClick: () => void;
+  onCreateClick: QRL<() => void>;
 }

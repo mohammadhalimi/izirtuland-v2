@@ -64,7 +64,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
       } else {
         error.value = 'خطا در دریافت محصولات';
       }
-    } catch (err) {
+    } catch {
       error.value = 'خطا در ارتباط با سرور';
     } finally {
       loading.value = false;
@@ -108,7 +108,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
       };
       reader.readAsDataURL(file);
 
-    } catch (err) {
+    } catch {
       error.value = 'خطا در پردازش عکس';
       uploadLoading.value = false;
     } finally {
@@ -158,7 +158,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
         try {
           const errorData = await response.json();
           error.value = errorData.message || `خطا: ${response.status}`;
-        } catch (parseError) {
+        } catch {
           error.value = `خطای سرور: ${response.status} - ${response.statusText}`;
         }
       }
@@ -198,7 +198,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
       } else {
         error.value = 'خطا در حذف محصول';
       }
-    } catch (err) {
+    } catch {
       error.value = 'خطا در ارتباط با سرور';
     } finally {
       deleteLoading.value = false;
@@ -277,7 +277,7 @@ export default component$<ProductManagerProps>(({ authToken }) => {
         try {
           const errorData = await response.json();
           error.value = errorData.message || `خطا: ${response.status}`;
-        } catch (parseError) {
+        } catch {
           error.value = `خطای سرور: ${response.status} - ${response.statusText}`;
         }
       }
@@ -302,13 +302,6 @@ export default component$<ProductManagerProps>(({ authToken }) => {
     deleteLoading.value = false;
   });
 
-  // Handle form input
-  const handleFormInput = $(
-    <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
-      formData[field] = value;
-    }
-  );
-
   // Fetch products on component mount
   useTask$(() => {
     fetchProducts();
@@ -322,8 +315,12 @@ export default component$<ProductManagerProps>(({ authToken }) => {
         })}
       />
 
-      <ErrorAlert message={error.value} onClose={() => error.value = ''} />
-
+      <ErrorAlert
+        message={error.value}
+        onClose={$(() => {  // با $ wrap کنید
+          error.value = '';
+        })}
+      />
       {/* Create Form */}
       {showCreateForm.value && (
         <ProductForm

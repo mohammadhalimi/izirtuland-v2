@@ -23,7 +23,26 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
   const message = useSignal('');
   const messageType = useSignal<'success' | 'error'>('success');
   const hasError = useSignal(false);
+  // تعریف توابع تغییر state
+  const handleUsernameChange = $((value: string) => {
+    newUsername.value = value;
+  });
 
+  const handleCurrentPasswordChange = $((value: string) => {
+    currentPassword.value = value;
+  });
+
+  const handleNewPasswordChange = $((value: string) => {
+    newPassword.value = value;
+  });
+
+  const handleConfirmPasswordChange = $((value: string) => {
+    confirmPassword.value = value;
+  });
+
+  const handleSubmit = $(() => {
+    handleUpdateProfile();
+  });
   // Check for user ID on component load
   useTask$(({ track }) => {
     track(() => currentAdmin._id);
@@ -68,19 +87,19 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      
+
       if (!file.type.startsWith('image/')) {
         message.value = 'لطفاً فقط فایل تصویر انتخاب کنید';
         messageType.value = 'error';
         return;
       }
-      
+
       if (file.size > 5 * 1024 * 1024) {
         message.value = 'حجم فایل باید کمتر از ۵ مگابایت باشد';
         messageType.value = 'error';
         return;
       }
-      
+
       selectedFile.value = file;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -114,19 +133,19 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
         message.value = 'عکس پروفایل با موفقیت آپلود شد 🌱';
         messageType.value = 'success';
         selectedFile.value = null;
-        
+
         const fullImageUrl = getFullImageUrl(data.profileImage);
         previewUrl.value = fullImageUrl;
-        
+
         await updateAdminDataInCookie(data.profileImage);
         await updateLocalStorage(data.profileImage);
-        
+
         setTimeout(() => message.value = '', 3000);
       } else {
         message.value = data.message || 'خطا در آپلود عکس';
         messageType.value = 'error';
       }
-    } catch (error) {
+    } catch {
       message.value = 'خطا در ارتباط با سرور';
       messageType.value = 'error';
     } finally {
@@ -192,13 +211,13 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
       if (response.ok) {
         message.value = 'تغییرات با موفقیت اعمال شد 🌟';
         messageType.value = 'success';
-        
+
         // Reset form
         newUsername.value = '';
         currentPassword.value = '';
         newPassword.value = '';
         confirmPassword.value = '';
-        
+
         // Reload if username changed
         if (updateData.username) {
           setTimeout(() => window.location.reload(), 1500);
@@ -209,7 +228,7 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
         message.value = data.message || 'خطا در اعمال تغییرات';
         messageType.value = 'error';
       }
-    } catch (error) {
+    } catch {
       message.value = 'خطا در ارتباط با سرور';
       messageType.value = 'error';
     } finally {
@@ -230,7 +249,7 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
   return (
     <div class="space-y-6">
       {/* Header */}
-      <ProfileHeader 
+      <ProfileHeader
         username={currentAdmin.username}
         role={currentAdmin.role}
         profileImageUrl={previewUrl.value}
@@ -248,19 +267,19 @@ export default component$<EditProfileProps>(({ authToken, currentAdmin }) => {
 
       {/* Profile Form */}
       <ProfileForm
-        currentUsername={currentAdmin.username}
+        currentUsername={currentAdmin.username}  // اصلاح شده: از currentAdmin.username استفاده کنید
         newUsername={newUsername.value}
         currentPassword={currentPassword.value}
         newPassword={newPassword.value}
         confirmPassword={confirmPassword.value}
-        isLoading={isLoading.value}
         message={message.value}
         messageType={messageType.value}
-        onUsernameChange={(value) => newUsername.value = value}
-        onCurrentPasswordChange={(value) => currentPassword.value = value}
-        onNewPasswordChange={(value) => newPassword.value = value}
-        onConfirmPasswordChange={(value) => confirmPassword.value = value}
-        onSubmit={handleUpdateProfile}
+        isLoading={isLoading.value}
+        onUsernameChange={handleUsernameChange}
+        onCurrentPasswordChange={handleCurrentPasswordChange}
+        onNewPasswordChange={handleNewPasswordChange}
+        onConfirmPasswordChange={handleConfirmPasswordChange}
+        onSubmit={handleSubmit}
       />
 
       {/* Security Info */}

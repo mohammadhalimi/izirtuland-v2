@@ -15,7 +15,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
     }
 
     const query = searchQuery.value.toLowerCase().trim();
-    filteredProducts.value = products.filter(product => 
+    filteredProducts.value = products.filter(product =>
       product.name.toLowerCase().includes(query) ||
       product.content.toLowerCase().includes(query) ||
       product.brand.toLowerCase().includes(query) ||
@@ -65,7 +65,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                 </div>
               </div>
             </div>
-            
+
             {searchQuery.value && (
               <button
                 onClick$={() => {
@@ -87,16 +87,16 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
             {searchQuery.value ? '🔍' : '🌿'}
           </div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">
-            {searchQuery.value 
-              ? `نتیجه‌ای برای "${searchQuery.value}" یافت نشد` 
+            {searchQuery.value
+              ? `نتیجه‌ای برای "${searchQuery.value}" یافت نشد`
               : 'هنوز محصولی وجود ندارد'}
           </h3>
           <p class="text-gray-600">
-            {searchQuery.value 
-              ? 'لطفاً عبارت جستجو را تغییر دهید' 
+            {searchQuery.value
+              ? 'لطفاً عبارت جستجو را تغییر دهید'
               : 'اولین محصول خود را ایجاد کنید'}
           </p>
-          
+
           {searchQuery.value && (
             <button
               onClick$={() => {
@@ -135,7 +135,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
               </div>
             </div>
           </div>
-          
+
           <div class="flex items-center gap-4">
             {/* نتایج جستجو */}
             <div class="text-sm text-gray-600">
@@ -143,7 +143,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
               <span class="mr-1">محصول از</span>
               <span class="font-medium">{products.length}</span>
             </div>
-            
+
             {searchQuery.value && (
               <button
                 onClick$={() => {
@@ -158,7 +158,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
             )}
           </div>
         </div>
-        
+
         {/* فیلترهای سریع */}
         <div class="mt-4 flex flex-wrap gap-2">
           <button
@@ -224,6 +224,8 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                         <img
                           src={getFullImageUrl(product.image)}
                           alt={product.name}
+                          width={10}
+                          height={10}
                           class="w-10 h-10 rounded-lg object-cover"
                         />
                       )}
@@ -232,7 +234,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                           {/* هایلایت متن جستجو */}
                           {searchQuery.value ? (
                             <span>
-                              {product.name.split(new RegExp(`(${searchQuery.value})`, 'gi')).map((part, i) => 
+                              {product.name.split(new RegExp(`(${searchQuery.value})`, 'gi')).map((part, i) =>
                                 part.toLowerCase() === searchQuery.value.toLowerCase() ? (
                                   <mark key={i} class="bg-yellow-200 px-1 rounded">{part}</mark>
                                 ) : (
@@ -251,11 +253,10 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      product.brand === 'Izirtu Land'
+                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.brand === 'Izirtu Land'
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-orange-100 text-orange-800'
-                    }`}>
+                      }`}>
                       {product.brand}
                     </span>
                   </td>
@@ -263,11 +264,10 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                     {product.price.toLocaleString()} تومان
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      product.model === 'جامد'
+                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.model === 'جامد'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-purple-100 text-purple-800'
-                    }`}>
+                      }`}>
                       {product.model}
                     </span>
                   </td>
@@ -322,7 +322,7 @@ export const ProductList = component$<ProductListProps>(({ products, loading, on
                 </span>
               )}
             </div>
-            
+
             {searchQuery.value && displayProducts.length > 0 && (
               <div class="text-sm text-gray-500">
                 <span class="inline-flex items-center gap-1">

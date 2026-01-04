@@ -1,3 +1,5 @@
+import { QRL } from "@builder.io/qwik";
+
 export interface ProfileHeaderProps {
   username: string;
   role: 'superadmin' | 'admin';
@@ -9,8 +11,8 @@ export interface ProfileImageUploadProps {
   selectedFile: File | null;
   isUploading: boolean;
   currentUsername: string;
-  onFileSelect: (event: Event) => void;
-  onUpload: () => void;
+  onFileSelect: QRL<(event: Event) => void>;
+  onUpload: QRL<() => void>;
 }
 
 export interface ProfileFormProps {
@@ -22,11 +24,11 @@ export interface ProfileFormProps {
   isLoading: boolean;
   message: string;
   messageType: 'success' | 'error';
-  onUsernameChange: (value: string) => void;
-  onCurrentPasswordChange: (value: string) => void;
-  onNewPasswordChange: (value: string) => void;
-  onConfirmPasswordChange: (value: string) => void;
-  onSubmit: () => void;
+  onUsernameChange: QRL<(value: string) => void>;
+  onCurrentPasswordChange: QRL<(value: string) => void>;
+  onNewPasswordChange: QRL<(value: string) => void>;
+  onConfirmPasswordChange: QRL<(value: string) => void>;
+  onSubmit: QRL<() => void>;
 }
 
 export interface ProfileSecurityInfoProps {
@@ -36,13 +38,13 @@ export interface ProfileSecurityInfoProps {
 }
 
 export interface ErrorStateProps {
-  onRetry: () => void;
+  onRetry: QRL<() => void>;
 }
 
 export interface SuccessMessageProps {
   message: string;
   type: 'success' | 'error';
-  onDismiss?: () => void;
+  onDismiss?: QRL<() => void>;
 }
 
 export interface EditProfileProps {

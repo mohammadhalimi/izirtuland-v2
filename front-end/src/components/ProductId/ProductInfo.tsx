@@ -1,14 +1,15 @@
 // src/components/ProductId/ProductInfo.tsx
-import { $, component$ } from '@builder.io/qwik';
+import { component$, QRL } from '@builder.io/qwik';
 import type { Product } from '~/components/types/product';
 import { Breadcrumb } from './Breadcrumb';
 import { ProductActions } from './ProductActions';
+import { formatPackageSize, formatPrice } from '../function/function';
 
 interface ProductInfoProps {
     product: Product;
     isAddingToCart: boolean; // اضافه شده
     isProductInCart: boolean;
-    onAddToCart: () => void; // این حالا یک QRL است
+    onAddToCart: QRL<() => void>; // این حالا یک QRL است
     apiBaseUrl: string;
 }
 
@@ -17,23 +18,8 @@ export const ProductInfo = component$<ProductInfoProps>(({
     isProductInCart,
     isAddingToCart,
     onAddToCart,
-    apiBaseUrl
 }) => {
-    const formatPrice = (price: number) => {
-        return price.toLocaleString('fa-IR') + ' تومان';
-    };
-
-    const formatPackageSize = (packageSize: string) => {
-        const sizeMap: { [key: string]: string } = {
-            '1kg': '۱ کیلوگرم',
-            '10kg': '۱۰ کیلوگرم',
-            '1litre': '۱ لیتر',
-            '5liter': '۵ لیتر',
-            '20litre': '۲۰ لیتر'
-        };
-        return sizeMap[packageSize] || packageSize;
-    };
-
+ 
     const getBrandColor = (brand: string): string => {
         if (brand === 'Izirtu Land') return 'blue';
         if (brand === 'Khak Shimi') return 'orange';

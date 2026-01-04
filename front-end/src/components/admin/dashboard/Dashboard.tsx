@@ -75,7 +75,7 @@ const fetchOrders = $(async () => {
             } else {
                 error.value = 'خطا در دریافت محصولات';
             }
-        } catch (err) {
+        } catch {
             error.value = 'خطا در ارتباط با سرور';
         }
     });

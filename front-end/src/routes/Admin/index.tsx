@@ -4,7 +4,7 @@ import { DocumentHead, routeAction$, zod$ } from '@builder.io/qwik-city';
 import { loginSchema } from '../../components/schemas/auth';
 import { AuthService } from '../../components/service/auth-service';
 import { AUTH_CONSTANTS } from '~/components/constants/auth';
-import type { LoginFormData, LoginActionResponse, LoginSuccessResponse, LoginErrorResponse } from '~/components/types/authAdmin';
+import type { LoginFormData, LoginSuccessResponse, LoginErrorResponse } from '~/components/types/authAdmin';
 import type { LoginActionStore } from '~/components/types/qwik-types';
 import { LoginHeader } from '../../components/loginAdmin/login-header';
 import { LoginLayout } from '../../components/loginAdmin/login-layout'

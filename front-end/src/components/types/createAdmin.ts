@@ -1,3 +1,5 @@
+import { QRL } from "@builder.io/qwik";
+
 export interface CreateAdminProps {
   authToken: string;
   currentAdmin: {
@@ -30,7 +32,7 @@ export interface CreateAdminFormProps {
   isLoading: { value: boolean };
   message: { value: string };
   messageType: { value: 'success' | 'error' };
-  onSubmit: () => void;
+  onSubmit: QRL<() => void>;
   currentAdminRole: 'admin' | 'superadmin';
 }
 
@@ -43,8 +45,8 @@ export interface AdminListProps {
   loadingAdmins: boolean;
   currentAdmin: Admin;
   deletingAdminId: string | null;
-  onRefresh: () => void;
-  onDeleteClick: (admin: Admin) => void;
+  onRefresh: QRL<() => void>;
+  onDeleteClick: QRL<(admin: Admin) => void>;
 }
 
 export interface DeleteAdminModalProps {

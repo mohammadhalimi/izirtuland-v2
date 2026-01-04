@@ -18,19 +18,19 @@ export const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fa-IR').format(price);
 };
 
-export const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR', {
+export const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'تاریخ نامشخص';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('fa-IR', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+        day: 'numeric'
+    }).format(date);
 };
 
 export const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('https')) return imagePath;
     return `${API_BASE_URL}${imagePath}`;
 };
 
@@ -127,26 +127,35 @@ export const formatTime = (dateString: string) => {
 
 // Helper functions
 export const getStatusClass = (status: string) => {
-  switch (status) {
-    case 'paid': 
-      return 'bg-green-100 text-green-800 border border-green-200';
-    case 'iscompleted': 
-      return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-    case 'pending': 
-      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-    case 'failed': 
-      return 'bg-red-100 text-red-800 border border-red-200';
-    default: 
-      return 'bg-gray-100 text-gray-800 border border-gray-200';
-  }
+    switch (status) {
+        case 'paid':
+            return 'bg-green-100 text-green-800 border border-green-200';
+        case 'iscompleted':
+            return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+        case 'pending':
+            return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+        case 'failed':
+            return 'bg-red-100 text-red-800 border border-red-200';
+        default:
+            return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
 };
 
 export const getStatusText = (status: string) => {
-  switch (status) {
-    case 'paid': return 'پرداخت شده';
-    case 'iscompleted': return 'تکمیل شده';
-    case 'pending': return 'در انتظار پرداخت';
-    case 'failed': return 'لغو شده';
-    default: return status;
-  }
+    switch (status) {
+        case 'paid': return 'پرداخت شده';
+        case 'iscompleted': return 'تکمیل شده';
+        case 'pending': return 'در انتظار پرداخت';
+        case 'failed': return 'لغو شده';
+        default: return status;
+    }
+};
+
+export const normalizeText = (text: string) => {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')        
+        .replace(/ي/g, 'ی')       
+        .replace(/ك/g, 'ک');   
 };

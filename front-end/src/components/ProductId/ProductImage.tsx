@@ -27,6 +27,8 @@ export const ProductImage = component$<ProductImageProps>(({ product, apiBaseUrl
                     <img
                         src={getFullImageUrl(product.image)}
                         alt={product.name}
+                        width={200}
+                        height={300}
                         class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
                         onError$={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
